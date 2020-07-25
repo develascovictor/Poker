@@ -45,6 +45,7 @@
     <Compile Include="Enums\Ranks.cs" />
     <Compile Include="Models\Card.cs" />
     <Compile Include="Models\Deck.cs" />
+    <Compile Include="Models\GroupedSuit.cs" />
     <Compile Include="Models\GroupedValue.cs" />
     <Compile Include="Models\Hand.cs" />
     <Compile Include="Program.cs" />
