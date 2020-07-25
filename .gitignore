@@ -1,0 +1,8 @@
+.vs/
+*.user
+packages/
+*/obj/*
+*/bin/*
+Poker.sln
+Poker.Unit.Tests/Properties/AssemblyInfo.cs
+Poker.v12.suo

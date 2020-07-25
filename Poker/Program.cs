@@ -1,164 +1,13 @@
-﻿using System;
-using System.Linq;
+﻿using Poker.Enums;
+using Poker.Extensions;
+using Poker.Models;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reflection;
+using System.Linq;
 using System.Text;
 
 namespace Poker
 {
-    #region Enums
-    public enum Ranks
-    {
-        [Description("High Card")]
-        HighCard = 0,
-        [Description("1 Pair")]
-        OnePair = 1,
-        [Description("2 Pairs")]
-        TwoPairs = 2,
-        [Description("3 Of A Kind")]
-        ThreeOfAKind = 3,
-        [Description("Straight")]
-        Straight = 4,
-        [Description("Flush")]
-        Flush = 5,
-        [Description("Full House")]
-        FullHouse = 6,
-        [Description("4 Of A Kind")]
-        FourOfAKind = 7,
-        [Description("Straight Flush")]
-        StraightFlush = 8
-    }
-
-    public enum Suits
-    {
-        Heart = 1,
-        Diamond = 2,
-        Club = 3,
-        Spade = 4
-    }
-    #endregion
-
-    #region Classes
-    public class Card
-    {
-        public Suits Suit { get; set; }
-        public int Value { get; set; }
-    }
-
-    public class Hand
-    {
-        public List<Card> Cards { get; set; }
-        public Ranks Rank { get; set; }
-        public string Details { get; set; }
-
-        public Hand()
-        {
-            Cards = new List<Card>();
-            Rank = Ranks.HighCard;
-            Details = String.Empty;
-        }
-    }
-
-    public class Deck
-    {
-        public List<Card> Cards { get; set; }
-
-        public Deck()
-        {
-            Cards = new List<Card>();
-        }
-    }
-
-    public class GroupedValue
-    {
-        public int Value { get; set; }
-        public int Count { get; set; }
-    }
-
-    public class GroupedSuit
-    {
-        public Suits Suit { get; set; }
-        public int Count { get; set; }
-    }
-
-    public static class Extensions
-    {
-        /// <summary>
-        /// Method to obtain the Description value of an enum, if it lacks a description, simply converts the enum to string
-        /// </summary>
-        /// <param name="enumValue"></param>
-        /// <returns></returns>
-        public static string GetDescription(this Enum enumValue)
-        {
-            string enumDescription;
-            FieldInfo fieldInfo = enumValue.GetType().GetField(enumValue.ToString());
-
-            if (fieldInfo != null)
-            {
-                DescriptionAttribute[] attributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
-                enumDescription = attributes.Length > 0 ? attributes[0].Description : enumValue.ToString();
-            }
-
-            else
-            {
-                enumDescription = String.Empty;
-            }
-
-            return enumDescription;
-        }
-
-        /// <summary>
-        /// Method to obtain the Description value of a card value
-        /// </summary>
-        /// <param name="cardValue"></param>
-        /// <returns></returns>
-        public static string GetDescription(this int cardValue)
-        {
-            switch (cardValue)
-            {
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                    {
-                        return cardValue.ToString();
-                    }
-
-                case 11:
-                    {
-                        return "Jack";
-                    }
-
-                case 12:
-                    {
-                        return "Queen";
-                    }
-
-                case 13:
-                    {
-                        return "King";
-                    }
-
-                case 14:
-                    {
-                        return "Ace";
-                    }
-
-                default:
-                    {
-                        return "Undefined";
-                    }
-            }
-        }
-    }
-    #endregion
-
     class Program
     {
         #region Main
@@ -167,10 +16,10 @@ namespace Poker
             //Used for iterations
             int i;
             //All cards that have been pulled from deck will be stored here
-            Deck deck = new Deck();
+            var deck = new Deck();
 
             //Fill deck with cards
-            foreach (Suits suit in Enum.GetValues(typeof(Suits)).Cast<Suits>())
+            foreach (var suit in Enum.GetValues(typeof(Suits)).Cast<Suits>())
             {
                 for (i = 2; i <= 14; i++)
                 {
@@ -179,7 +28,7 @@ namespace Poker
             }
 
             //Playing hands
-            List<Hand> hands = new List<Hand>
+            var hands = new List<Hand>
             {
                 GetHand(ref deck),
                 GetHand(ref deck),
@@ -240,9 +89,9 @@ namespace Poker
             #endregion
 
             i = 0;
-            StringBuilder message = new StringBuilder();
+            var message = new StringBuilder();
 
-            foreach (Hand hand in hands)
+            foreach (var hand in hands)
             {
                 i++;
                 hand.Details =
@@ -256,7 +105,7 @@ namespace Poker
                 message.Append("\n--------------------------\n\n");
             }
 
-            List<Hand> winningHands = GetWinningHands(hands);
+            var winningHands = GetWinningHands(hands);
 
             if (winningHands.Count == 1)
             {
@@ -301,12 +150,12 @@ namespace Poker
         /// <returns></returns>
         private static List<Hand> GetWinningHands(List<Hand> hands)
         {
-            Ranks highestRank = hands.Max(h => h.Rank);
-            List<Hand> winningHands = hands.Where(r => r.Rank == highestRank).ToList();
+            var highestRank = hands.Max(h => h.Rank);
+            var winningHands = hands.Where(r => r.Rank == highestRank).ToList();
 
             if (winningHands.Count != 1)
             {
-                List<Hand> handsForTieBreak = hands.Where(r => r.Rank == highestRank).ToList();
+                var handsForTieBreak = hands.Where(r => r.Rank == highestRank).ToList();
 
                 switch (highestRank)
                 {
@@ -367,9 +216,9 @@ namespace Poker
         /// <returns></returns>
         private static Hand GetHand(ref Deck deck)
         {
-            List<Card> cards = GetCards(ref deck);
-            Ranks rank = GetRank(cards);
-            Hand hand = new Hand { Cards = cards, Rank = rank };
+            var cards = GetCards(ref deck);
+            var rank = GetRank(cards);
+            var hand = new Hand { Cards = cards, Rank = rank };
 
             return hand;
         }
@@ -388,8 +237,8 @@ namespace Poker
             }
 
             int index;
-            Random random = new Random();
-            List<Card> hand = new List<Card>();
+            var random = new Random();
+            var hand = new List<Card>();
 
             for (int i = 0; i < 5; i++)
             {
@@ -421,17 +270,19 @@ namespace Poker
         /// <returns></returns>
         private static Ranks GetRank(List<Card> cards)
         {
-            List<GroupedSuit> groupedBySuits =
+            var groupedBySuits =
                 cards
                 .GroupBy(c => c.Suit)
                 .Select(c => new GroupedSuit { Suit = c.Key, Count = c.Count() })
-                .OrderByDescending(c => c.Count).ToList();
+                .OrderByDescending(c => c.Count)
+                .ToList();
 
-            List<GroupedValue> groupedByValues =
+            var groupedByValues =
                 cards
                 .GroupBy(c => c.Value)
                 .Select(c => new GroupedValue { Value = c.Key, Count = c.Count() })
-                .OrderByDescending(c => c.Count).ToList();
+                .OrderByDescending(c => c.Count)
+                .ToList();
 
             if (groupedBySuits.Count == 1)
             {
@@ -448,7 +299,7 @@ namespace Poker
                 return Ranks.Straight;
             }
 
-            int maxGroupedValues = groupedByValues.Max(c => c.Count);
+            var maxGroupedValues = groupedByValues.Max(c => c.Count);
 
             switch (maxGroupedValues)
             {
@@ -481,8 +332,8 @@ namespace Poker
                 return false;
             }
 
-            int minValue = cards.Min(c => c.Value);
-            int maxValue = cards.Max(c => c.Value);
+            var minValue = cards.Min(c => c.Value);
+            var maxValue = cards.Max(c => c.Value);
 
             if (maxValue == 14 && minValue == 2)
             {
