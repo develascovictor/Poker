@@ -100,7 +100,7 @@ namespace Poker
                     + ": \nRank: "
                     + hand.Rank.GetDescription()
                     + "\nCards:"
-                    + hand.Cards.Aggregate(String.Empty, (current, card) => current + ("\n\t- " + card.Suit.GetDescription() + " of " + card.Value.GetDescription()));
+                    + hand.Cards.Aggregate(String.Empty, (current, card) => current + ("\n\t- " + card.Suit.GetDescription() + " of " + card.Value.GetCardValueDescription()));
                 message.Append(hand.Details);
                 message.Append("\n--------------------------\n\n");
             }
