@@ -13,19 +13,8 @@ namespace Poker
         #region Main
         static void Main()
         {
-            //Used for iterations
-            int i;
             //All cards that have been pulled from deck will be stored here
             var deck = new Deck();
-
-            //Fill deck with cards
-            foreach (var suit in Enum.GetValues(typeof(Suits)).Cast<Suits>())
-            {
-                for (i = 2; i <= 14; i++)
-                {
-                    deck.Cards.Add(new Card { Value = i, Suit = suit });
-                }
-            }
 
             //Playing hands
             var hands = new List<Hand>
@@ -88,7 +77,7 @@ namespace Poker
             //};
             #endregion
 
-            i = 0;
+            var i = 0;
             var message = new StringBuilder();
 
             foreach (var hand in hands)
