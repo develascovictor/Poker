@@ -53,6 +53,12 @@
     <Compile Include="Enums\RanksTests.cs" />
     <Compile Include="Extensions\CardExtensionsTests.cs" />
     <Compile Include="Extensions\StringExtensionsTests.cs" />
+    <Compile Include="Models\Base\BaseModelTests.cs" />
+    <Compile Include="Models\GroupedSuitTests.cs" />
+    <Compile Include="Models\HandTests.cs" />
+    <Compile Include="Models\GroupedValueTests.cs" />
+    <Compile Include="Models\DeckTests.cs" />
+    <Compile Include="Models\CardTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
