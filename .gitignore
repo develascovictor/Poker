@@ -1,7 +1,8 @@
 .vs/
 *.user
 packages/
-*/obj/*
+Poker/obj/*
+Poker.Unit.Tests/obj/*
 */bin/*
 Poker.sln
 Poker.v12.suo

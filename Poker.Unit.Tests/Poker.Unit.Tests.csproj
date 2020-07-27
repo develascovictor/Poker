@@ -51,6 +51,9 @@
     <Compile Include="Enums\Base\BaseEnumTests.cs" />
     <Compile Include="Enums\SuitsTests.cs" />
     <Compile Include="Enums\RanksTests.cs" />
+    <Compile Include="Exceptions\Base\BaseExceptionTests.cs" />
+    <Compile Include="Exceptions\InvalidCardValueExceptionTests.cs" />
+    <Compile Include="Exceptions\NoCardsLeftExceptionTests.cs" />
     <Compile Include="Extensions\CardExtensionsTests.cs" />
     <Compile Include="Extensions\StringExtensionsTests.cs" />
     <Compile Include="Models\Base\BaseModelTests.cs" />
