@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Poker.Exceptions;
 using Poker.Extensions;
 using System;
 
@@ -76,10 +77,9 @@ namespace Poker.Unit.Tests.Extensions
         [TestCase(1)]
         [TestCase(15)]
         [TestCase(16)]
-        public void ShouldThrowArgumentExceptionOnGetCardValueDescription(int value)
+        public void ShouldThrowInvalidCardValueExceptionOnGetCardValueDescription(int value)
         {
-            var exception = Assert.Catch<ArgumentException>(() => value.GetCardValueDescription());
-            Assert.AreEqual(exception.Message, $"Invalid card value. [Card Value: {value}]");
+            Assert.Throws<InvalidCardValueException>(() => value.GetCardValueDescription());
         }
     }
 }

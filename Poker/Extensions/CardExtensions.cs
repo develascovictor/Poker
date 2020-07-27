@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Poker.Exceptions;
+using System;
 
 namespace Poker.Extensions
 {
@@ -48,7 +49,7 @@ namespace Poker.Extensions
 
                 default:
                     {
-                        throw new ArgumentException($"Invalid card value. [Card Value: {cardValue}]");
+                        throw new InvalidCardValueException(cardValue);
                     }
             }
         }
