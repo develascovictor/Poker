@@ -1,47 +1,58 @@
-﻿using Poker.Enums;
+﻿using NUnit.Framework;
+using Poker.Enums;
 using Poker.Extensions;
+using Poker.Models;
+using Poker.Unit.Tests.Models.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Poker.Models
+namespace Poker.Unit.Tests.Models.Testers
 {
-    public class Hand
+    public class HandTester : IHandTester
     {
-        public IList<Card> Cards { get; private set; }
+        /// <summary>
+        /// Test case
+        /// </summary>
+        public IEnumerable<Card> Cards { get; set; }
 
-        public Ranks Rank => GetRank();
-
-        public string Details =>
-                    "Rank: "
-                    + Rank.GetDescription()
-                    + "\nCards:"
-                    + Cards.Aggregate(string.Empty, (current, card) => current + ("\n\t- " + card.Suit.GetDescription() + " of " + card.Description));
-
-        public Hand(IEnumerable<Card> cards)
+        public void RunShouldInstantiateConstructorWithParameters()
         {
-            Cards = (cards ?? new List<Card>()).Where(x => x != null).ToList();
+            var hand = new Hand(Cards);
+            var serialized = (Cards ?? new List<Card>()).Where(x => x != null).ToList();
+            var errorMessage = ErrorMessage();
+
+            Assert.IsNotNull(hand.Cards, errorMessage);
+            Assert.AreEqual(serialized.Count, hand.Cards.Count, errorMessage);
+
+            for (var i = 0; i < serialized.Count; i++)
+            {
+                Assert.AreEqual(serialized[i].Suit, hand.Cards[i].Suit, GetIterationError(nameof(Card.Suit), i));
+                Assert.AreEqual(serialized[i].Value, hand.Cards[i].Value, GetIterationError(nameof(Card.Value), i));
+            }
+
+            var rank = GetRank(serialized);
+            Assert.AreEqual(rank, hand.Rank, errorMessage);
+
+            var details = GetDetails(rank, serialized);
+            Assert.AreEqual(details, hand.Details, errorMessage);
         }
 
-        /// <summary>
-        /// Evaluate rank
-        /// </summary>
-        /// <returns></returns>
-        private Ranks GetRank()
+        private static Ranks GetRank(IEnumerable<Card> cards)
         {
-            if (!Cards.Any())
+            if (!cards.Any())
             {
                 return Ranks.HighCard;
             }
 
             var groupedBySuits =
-                Cards
+                cards
                 .GroupBy(c => c.Suit)
                 .Select(c => new GroupedSuit { Suit = c.Key, Count = c.Count() })
                 .OrderByDescending(c => c.Count)
                 .ToList();
 
             var groupedByValues =
-                Cards
+                cards
                 .GroupBy(c => c.Value)
                 .Select(c => new GroupedValue { Value = c.Key, Count = c.Count() })
                 .OrderByDescending(c => c.Count)
@@ -83,11 +94,6 @@ namespace Poker.Models
             return Ranks.HighCard;
         }
 
-        /// <summary>
-        /// Evaluate if the set of cards are straight
-        /// </summary>
-        /// <param name="cards"></param>
-        /// <returns></returns>
         private static bool IsStraight(List<GroupedValue> cards)
         {
             //If all cards are NOT different
@@ -106,6 +112,22 @@ namespace Poker.Models
             }
 
             return maxValue - minValue == 4;
+        }
+
+        private static string GetDetails(Ranks rank, IEnumerable<Card> cards)
+        {
+            return "Rank: "
+                + rank.GetDescription()
+                + "\nCards:"
+                + cards.Aggregate(string.Empty, (current, card) => current + ("\n\t- " + card.Suit.GetDescription() + " of " + card.Description));
+        }
+
+        private string GetIterationError(string concept, int i) => $"{concept} don't match. [i: {i}]\n\n{ErrorMessage()}";
+
+        private string ErrorMessage()
+        {
+            var testCase = Cards.Stringify();
+            return $"{testCase}";
         }
     }
 }

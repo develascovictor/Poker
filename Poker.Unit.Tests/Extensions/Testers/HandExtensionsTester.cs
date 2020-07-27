@@ -14,7 +14,7 @@ namespace Poker.Unit.Tests.Extensions.Testers
         /// <summary>
         /// Test case
         /// </summary>
-        public IEnumerable<Hand> Hands { private get; set; }
+        public IEnumerable<Hand> Hands { get; set; }
 
         public void RunGetDetailedHand()
         {
@@ -55,17 +55,17 @@ namespace Poker.Unit.Tests.Extensions.Testers
             {
                 case 0:
                     {
-                        return "\n\nThere are no winning hands.";
+                        return "There are no winning hands.";
                     }
 
                 case 1:
                     {
-                        return $"\n\nWinning Hand is:\n\n{filteredHands.Single().Details}";
+                        return $"Winning Hand is:\n\n{filteredHands.Single().Details}";
                     }
 
                 default:
                     {
-                        return $"\n\nTie between:\n\n{filteredHands.Aggregate(string.Empty, (current, hand) => current + hand.Details + "\n\n")}";
+                        return $"Tie between:\n\n{filteredHands.Aggregate(string.Empty, (current, hand) => current + hand.Details + "\n\n")}";
                     }
             }
         }

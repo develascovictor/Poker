@@ -2,6 +2,8 @@
 using Poker.Enums;
 using Poker.Models;
 using Poker.Unit.Tests.Models.Base;
+using Poker.Unit.Tests.Models.Interfaces;
+using Poker.Unit.Tests.Models.Testers;
 using System.Collections.Generic;
 
 namespace Poker.Unit.Tests.Models
@@ -22,13 +24,71 @@ namespace Poker.Unit.Tests.Models
             ValidateNonSettableProperty(propertyName);
         }
 
-        [Test]
-        public void ShouldInstantiateEmptyConstructor()
+        [TestCaseSource(nameof(TestCases))]
+        public void ShouldInstantiateConstructorWithParameters(IHandTester tester)
         {
-            var hand = new Hand(null);
-            Assert.AreEqual(hand.Cards, new List<Card>());
-            Assert.AreEqual(hand.Rank, Ranks.HighCard);
-            Assert.AreEqual(hand.Details, string.Empty);
+            tester.RunShouldInstantiateConstructorWithParameters();
+        }
+
+        private static IEnumerable<IHandTester> TestCases()
+        {
+            yield return new HandTester
+            {
+                Cards = new List<Card>
+                {
+                    new Card(Suits.Club, 2),
+                    new Card(Suits.Club, 7),
+                    new Card(Suits.Spade, 3),
+                    new Card(Suits.Club, 12),
+                    new Card(Suits.Heart, 13),
+                    new Card(Suits.Spade, 14)
+                }
+            };
+            yield return new HandTester
+            {
+                Cards = new List<Card>
+                {
+                    new Card(Suits.Diamond, 5),
+                    new Card(Suits.Diamond, 8),
+                    new Card(Suits.Spade, 8),
+                    new Card(Suits.Heart, 8),
+                    new Card(Suits.Heart, 9),
+                    new Card(Suits.Diamond, 11)
+                }
+            };
+            yield return new HandTester
+            {
+                Cards = new List<Card>
+                {
+                    new Card(Suits.Diamond, 5),
+                    new Card(Suits.Heart, 5),
+                    new Card(Suits.Diamond, 10)
+                }
+            };
+            yield return new HandTester
+            {
+                Cards = new List<Card>
+                {
+                    null,
+                    new Card(Suits.Spade, 2)
+                }
+            };
+            yield return new HandTester
+            {
+                Cards = new List<Card>
+                {
+                    null,
+                    null
+                }
+            };
+            yield return new HandTester
+            {
+                Cards = new List<Card>()
+            };
+            yield return new HandTester
+            {
+                Cards = null
+            };
         }
     }
 }
