@@ -55,7 +55,7 @@
     <Compile Include="Exceptions\InvalidCardValueExceptionTests.cs" />
     <Compile Include="Exceptions\NoCardsLeftExceptionTests.cs" />
     <Compile Include="Extensions\CardExtensionsTests.cs" />
-    <Compile Include="Extensions\StringExtensionsTests.cs" />
+    <Compile Include="Extensions\EnumExtensionsTests.cs" />
     <Compile Include="Models\Base\BaseModelTests.cs" />
     <Compile Include="Models\GroupedSuitTests.cs" />
     <Compile Include="Models\HandTests.cs" />
