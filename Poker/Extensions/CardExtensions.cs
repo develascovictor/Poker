@@ -1,5 +1,4 @@
 ﻿using Poker.Exceptions;
-using System;
 
 namespace Poker.Extensions
 {
