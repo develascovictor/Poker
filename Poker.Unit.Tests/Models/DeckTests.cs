@@ -51,7 +51,7 @@ namespace Poker.Unit.Tests.Models
             {
                 for (i = 2; i <= 14; i++)
                 {
-                    cards.Add(new Card { Value = i, Suit = suit });
+                    cards.Add(new Card(suit, i));
                 }
             }
 

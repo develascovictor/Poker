@@ -10,17 +10,22 @@ namespace Poker.Unit.Tests.Models
     public class HandTests : BaseModelTests<Hand>
     {
         [TestCase(nameof(Hand.Cards))]
+        public void ShouldValidatePrivateSettableProperty(string propertyName)
+        {
+            ValidatePrivateSettableProperty(propertyName);
+        }
+
         [TestCase(nameof(Hand.Rank))]
         [TestCase(nameof(Hand.Details))]
         public void ShouldValidatePublicAccessorProperty(string propertyName)
         {
-            ValidatePublicAccessorProperty(propertyName);
+            ValidateNonSettableProperty(propertyName);
         }
 
         [Test]
         public void ShouldInstantiateEmptyConstructor()
         {
-            var hand = new Hand();
+            var hand = new Hand(null);
             Assert.AreEqual(hand.Cards, new List<Card>());
             Assert.AreEqual(hand.Rank, Ranks.HighCard);
             Assert.AreEqual(hand.Details, string.Empty);
