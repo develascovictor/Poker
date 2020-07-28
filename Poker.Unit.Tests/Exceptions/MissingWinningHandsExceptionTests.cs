@@ -8,7 +8,7 @@ namespace Poker.Unit.Tests.Exceptions
     public class MissingWinningHandsExceptionTests : BaseExceptionTests
     {
         [Test]
-        public void ShouldInstantiateConstructorWithParameters()
+        public void ShouldInstantiateEmptyConstructor()
         {
             var missingWinningHandsException = new MissingWinningHandsException();
             ValidateException(missingWinningHandsException, "Winning cards list is null or empty.");

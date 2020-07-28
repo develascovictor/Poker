@@ -5,13 +5,13 @@ using Poker.Unit.Tests.Exceptions.Base;
 namespace Poker.Unit.Tests.Exceptions
 {
     [TestFixture]
-    public class NoCardsLeftExceptionTests : BaseExceptionTests
+    public class MissingCardsOnHandExceptionTests : BaseExceptionTests
     {
         [Test]
         public void ShouldInstantiateEmptyConstructor()
         {
-            var noCardsLeftException = new NoCardsLeftException();
-            ValidateException(noCardsLeftException, "No cards left in deck.");
+            var missingCardsOnHandException = new MissingCardsOnHandException();
+            ValidateException(missingCardsOnHandException, "Cards in poker hand is null.");
         }
     }
 }

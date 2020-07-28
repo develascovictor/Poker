@@ -55,6 +55,9 @@
     <Compile Include="Enums\SuitsTests.cs" />
     <Compile Include="Enums\RanksTests.cs" />
     <Compile Include="Exceptions\Base\BaseExceptionTests.cs" />
+    <Compile Include="Exceptions\CardsInPokerHandIsNotFiveExceptionTests.cs" />
+    <Compile Include="Exceptions\CardInPokerHandIsNullExceptionTests.cs" />
+    <Compile Include="Exceptions\MissingCardsOnHandExceptionTests.cs" />
     <Compile Include="Exceptions\InvalidCardValueExceptionTests.cs" />
     <Compile Include="Exceptions\MissingWinningHandsExceptionTests.cs" />
     <Compile Include="Exceptions\NoCardsLeftExceptionTests.cs" />
