@@ -2,7 +2,7 @@
 using Poker.Enums;
 using Poker.Extensions;
 using Poker.Models;
-using Poker.Unit.Tests.Models.Interfaces;
+using Poker.Unit.Tests.Models.Testers.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 

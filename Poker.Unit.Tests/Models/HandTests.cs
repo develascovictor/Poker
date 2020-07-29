@@ -2,8 +2,8 @@
 using Poker.Enums;
 using Poker.Models;
 using Poker.Unit.Tests.Models.Base;
-using Poker.Unit.Tests.Models.Interfaces;
 using Poker.Unit.Tests.Models.Testers;
+using Poker.Unit.Tests.Models.Testers.Interfaces;
 using System.Collections.Generic;
 
 namespace Poker.Unit.Tests.Models

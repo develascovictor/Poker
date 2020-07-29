@@ -51,6 +51,7 @@
     <Compile Include="Exceptions\MissingCardsOnHandException.cs" />
     <Compile Include="Exceptions\MissingWinningHandsException.cs" />
     <Compile Include="Exceptions\InvalidCardValueException.cs" />
+    <Compile Include="Exceptions\RepeatedCardsException.cs" />
     <Compile Include="Exceptions\NoCardsLeftException.cs" />
     <Compile Include="Extensions\HandExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
