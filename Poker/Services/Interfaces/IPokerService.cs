@@ -1,7 +1,7 @@
 ﻿using Poker.Models;
 using System.Collections.Generic;
 
-namespace Poker.Interfaces
+namespace Poker.Services.Interfaces
 {
     public interface IPokerService
     {
@@ -10,6 +10,6 @@ namespace Poker.Interfaces
         /// </summary>
         /// <param name="hands"></param>
         /// <returns></returns>
-        List<Hand> GetWinningHands(List<Hand> hands);
+        IReadOnlyCollection<Hand> GetWinningHands(IReadOnlyCollection<Hand> hands);
     }
 }
