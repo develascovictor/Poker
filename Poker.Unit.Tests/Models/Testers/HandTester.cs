@@ -18,62 +18,91 @@ namespace Poker.Unit.Tests.Models.Testers
         public void RunShouldInstantiateConstructorWithParameters()
         {
             var hand = new Hand(Cards);
-            var serialized = (Cards ?? new List<Card>()).Where(x => x != null).ToList();
+            var serializedCards = (Cards ?? new List<Card>()).Where(x => x != null).ToList();
             var errorMessage = ErrorMessage();
 
             Assert.IsNotNull(hand.Cards, errorMessage);
-            Assert.AreEqual(serialized.Count, hand.Cards.Count, errorMessage);
+            Assert.AreEqual(serializedCards.Count, hand.Cards.Count, errorMessage);
 
-            for (var i = 0; i < serialized.Count; i++)
+            for (var i = 0; i < serializedCards.Count; i++)
             {
-                Assert.AreEqual(serialized[i].Suit, hand.Cards[i].Suit, GetIterationError(nameof(Card.Suit), i));
-                Assert.AreEqual(serialized[i].Value, hand.Cards[i].Value, GetIterationError(nameof(Card.Value), i));
+                Assert.AreEqual(serializedCards[i].Suit, hand.Cards[i].Suit, GetIterationError(nameof(Card.Suit), i));
+                Assert.AreEqual(serializedCards[i].Value, hand.Cards[i].Value, GetIterationError(nameof(Card.Value), i));
             }
 
-            var rank = GetRank(serialized);
+            var groupedBySuits = GetGroupedSuits(serializedCards);
+            var serializedGroupedSuits = hand.GroupedSuits.ToList();
+            Assert.AreEqual(groupedBySuits.Count, serializedGroupedSuits.Count, errorMessage);
+
+            for (var i = 0; i < groupedBySuits.Count; i++)
+            {
+                Assert.AreEqual(groupedBySuits[i].Suit, serializedGroupedSuits[i].Suit, GetIterationError(nameof(GroupedSuit.Suit), i));
+                Assert.AreEqual(groupedBySuits[i].Count, serializedGroupedSuits[i].Count, GetIterationError(nameof(GroupedSuit.Count), i));
+            }
+
+            var groupedByValues = GetGroupedValues(serializedCards);
+            var serializedGroupedValues = hand.GroupedValues.ToList();
+            Assert.AreEqual(groupedByValues.Count, serializedGroupedValues.Count, errorMessage);
+
+            for (var i = 0; i < groupedByValues.Count; i++)
+            {
+                Assert.AreEqual(groupedByValues[i].Value, serializedGroupedValues[i].Value, GetIterationError(nameof(GroupedValue.Value), i));
+                Assert.AreEqual(groupedByValues[i].Count, serializedGroupedValues[i].Count, GetIterationError(nameof(GroupedValue.Count), i));
+            }
+
+            var rank = GetRank(serializedCards, groupedBySuits, groupedByValues);
             Assert.AreEqual(rank, hand.Rank, errorMessage);
 
-            var details = GetDetails(rank, serialized);
+            var details = GetDetails(rank, serializedCards);
             Assert.AreEqual(details, hand.Details, errorMessage);
         }
 
-        private static Ranks GetRank(IEnumerable<Card> cards)
+        private static List<GroupedSuit> GetGroupedSuits(IEnumerable<Card> cards)
+        {
+            var groupedBySuits = cards
+                .GroupBy(c => c.Suit)
+                .Select(c => new GroupedSuit { Suit = c.Key, Count = c.Count() })
+                .OrderByDescending(c => c.Count)
+                .ToList();
+            return groupedBySuits;
+        }
+
+        private static List<GroupedValue> GetGroupedValues(IEnumerable<Card> cards)
+        {
+            var groupedValues =
+                cards
+                .GroupBy(c => c.Value)
+                .Select(c => new GroupedValue { Value = c.Key, Count = c.Count() })
+                .OrderByDescending(c => c.Count)
+                .ToList();
+            return groupedValues;
+        }
+
+        private static Ranks GetRank(IEnumerable<Card> cards, IReadOnlyCollection<GroupedSuit> groupedSuits, IReadOnlyCollection<GroupedValue> groupedValues)
         {
             if (!cards.Any())
             {
                 return Ranks.HighCard;
             }
 
-            var groupedBySuits =
-                cards
-                .GroupBy(c => c.Suit)
-                .Select(c => new GroupedSuit { Suit = c.Key, Count = c.Count() })
-                .OrderByDescending(c => c.Count)
-                .ToList();
+            var isStraight = IsStraight(groupedValues);
 
-            var groupedByValues =
-                cards
-                .GroupBy(c => c.Value)
-                .Select(c => new GroupedValue { Value = c.Key, Count = c.Count() })
-                .OrderByDescending(c => c.Count)
-                .ToList();
-
-            if (groupedBySuits.Count == 1)
+            if (groupedSuits.Count == 1)
             {
-                return IsStraight(groupedByValues) ? Ranks.StraightFlush : Ranks.Flush;
+                return isStraight ? Ranks.StraightFlush : Ranks.Flush;
             }
 
-            if (groupedByValues.Count == 2)
+            if (groupedValues.Count == 2)
             {
-                return groupedByValues[0].Count == 4 ? Ranks.FourOfAKind : Ranks.FullHouse;
+                return groupedValues.First().Count == 4 ? Ranks.FourOfAKind : Ranks.FullHouse;
             }
 
-            if (IsStraight(groupedByValues))
+            if (isStraight)
             {
                 return Ranks.Straight;
             }
 
-            var maxGroupedValues = groupedByValues.Max(c => c.Count);
+            var maxGroupedValues = groupedValues.Max(c => c.Count);
 
             switch (maxGroupedValues)
             {
@@ -85,7 +114,7 @@ namespace Poker.Unit.Tests.Models.Testers
                 case 2:
                     {
                         return
-                            groupedByValues.Count(c => c.Count == maxGroupedValues) == 2
+                            groupedValues.Count(c => c.Count == maxGroupedValues) == 2
                             ? Ranks.TwoPairs
                             : Ranks.OnePair;
                     }
@@ -94,7 +123,7 @@ namespace Poker.Unit.Tests.Models.Testers
             return Ranks.HighCard;
         }
 
-        private static bool IsStraight(List<GroupedValue> cards)
+        private static bool IsStraight(IReadOnlyCollection<GroupedValue> cards)
         {
             //If all cards are NOT different
             if (cards.Count != 5)

@@ -12,16 +12,13 @@ namespace Poker.Unit.Tests.Models
     public class HandTests : BaseModelTests<Hand>
     {
         [TestCase(nameof(Hand.Cards))]
+        [TestCase(nameof(Hand.Rank))]
+        [TestCase(nameof(Hand.Details))]
+        [TestCase(nameof(Hand.GroupedSuits))]
+        [TestCase(nameof(Hand.GroupedValues))]
         public void ShouldValidatePrivateSettableProperty(string propertyName)
         {
             ValidatePrivateSettableProperty(propertyName);
-        }
-
-        [TestCase(nameof(Hand.Rank))]
-        [TestCase(nameof(Hand.Details))]
-        public void ShouldValidatePublicAccessorProperty(string propertyName)
-        {
-            ValidateNonSettableProperty(propertyName);
         }
 
         [TestCaseSource(nameof(TestCases))]

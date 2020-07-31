@@ -1,6 +1,7 @@
 ﻿using Poker.Enums;
 using Poker.Extensions;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 
 namespace Poker.Models
@@ -9,17 +10,38 @@ namespace Poker.Models
     {
         public IList<Card> Cards { get; private set; }
 
-        public Ranks Rank => GetRank();
+        public Ranks Rank { get; private set; }
 
-        public string Details =>
-                    "Rank: "
-                    + Rank.GetDescription()
-                    + "\nCards:"
-                    + Cards.Aggregate(string.Empty, (current, card) => current + ("\n\t- " + card.Suit.GetDescription() + " of " + card.Description));
+        public string Details { get; private set; }
+
+        public IReadOnlyCollection<GroupedSuit> GroupedSuits { get; private set; }
+
+        public IReadOnlyCollection<GroupedValue> GroupedValues { get; private set; }
 
         public Hand(IEnumerable<Card> cards)
         {
             Cards = (cards ?? new List<Card>()).Where(x => x != null).ToList();
+
+            GroupedSuits =
+                Cards
+                .GroupBy(c => c.Suit)
+                .Select(c => new GroupedSuit { Suit = c.Key, Count = c.Count() })
+                .OrderByDescending(c => c.Count)
+                .ToList();
+            GroupedValues =
+                Cards
+                .GroupBy(c => c.Value)
+                .Select(c => new GroupedValue { Value = c.Key, Count = c.Count() })
+                .OrderByDescending(c => c.Count)
+                .ToList();
+
+            Rank = GetRank();
+
+            Details =
+                "Rank: "
+                + Rank.GetDescription()
+                + "\nCards:"
+                + Cards.Aggregate(string.Empty, (current, card) => current + ("\n\t- " + card.Suit.GetDescription() + " of " + card.Description));
         }
 
         /// <summary>
@@ -33,36 +55,24 @@ namespace Poker.Models
                 return Ranks.HighCard;
             }
 
-            var groupedBySuits =
-                Cards
-                .GroupBy(c => c.Suit)
-                .Select(c => new GroupedSuit { Suit = c.Key, Count = c.Count() })
-                .OrderByDescending(c => c.Count)
-                .ToList();
+            var isStraight = IsStraight();
 
-            var groupedByValues =
-                Cards
-                .GroupBy(c => c.Value)
-                .Select(c => new GroupedValue { Value = c.Key, Count = c.Count() })
-                .OrderByDescending(c => c.Count)
-                .ToList();
-
-            if (groupedBySuits.Count == 1)
+            if (GroupedSuits.Count == 1)
             {
-                return IsStraight(groupedByValues) ? Ranks.StraightFlush : Ranks.Flush;
+                return isStraight ? Ranks.StraightFlush : Ranks.Flush;
             }
 
-            if (groupedByValues.Count == 2)
+            if (GroupedValues.Count == 2)
             {
-                return groupedByValues[0].Count == 4 ? Ranks.FourOfAKind : Ranks.FullHouse;
+                return GroupedValues.First().Count == 4 ? Ranks.FourOfAKind : Ranks.FullHouse;
             }
 
-            if (IsStraight(groupedByValues))
+            if (isStraight)
             {
                 return Ranks.Straight;
             }
 
-            var maxGroupedValues = groupedByValues.Max(c => c.Count);
+            var maxGroupedValues = GroupedValues.Max(c => c.Count);
 
             switch (maxGroupedValues)
             {
@@ -74,7 +84,7 @@ namespace Poker.Models
                 case 2:
                     {
                         return
-                            groupedByValues.Count(c => c.Count == maxGroupedValues) == 2
+                            GroupedValues.Count(c => c.Count == maxGroupedValues) == 2
                             ? Ranks.TwoPairs
                             : Ranks.OnePair;
                     }
@@ -86,23 +96,25 @@ namespace Poker.Models
         /// <summary>
         /// Evaluate if the set of cards are straight
         /// </summary>
-        /// <param name="cards"></param>
         /// <returns></returns>
-        private static bool IsStraight(List<GroupedValue> cards)
+        private bool IsStraight()
         {
-            //If all cards are NOT different
-            if (cards.Count != 5)
+            //If at least one card is equal to another one (if all 5 are NOT different)
+            if (GroupedValues.Count != 5)
             {
                 return false;
             }
 
-            var minValue = cards.Min(c => c.Value);
-            var maxValue = cards.Max(c => c.Value);
+            var minValue = GroupedValues.Min(c => c.Value);
+            var maxValue = GroupedValues.Max(c => c.Value);
 
+            //If you got an Ace and a 2
             if (maxValue == 14 && minValue == 2)
             {
+                //Set the Ace value as 1
                 minValue = 1;
-                maxValue = cards.Where(c => c.Value != 14).Select(c => c.Value).Max();
+                //Get max value ignoring the original Ace
+                maxValue = GroupedValues.Where(c => c.Value != 14).Select(c => c.Value).Max();
             }
 
             return maxValue - minValue == 4;

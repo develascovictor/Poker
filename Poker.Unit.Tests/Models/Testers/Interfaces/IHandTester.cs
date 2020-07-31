@@ -1,8 +1,7 @@
-﻿using NUnit.Framework;
-using Poker.Models;
+﻿using Poker.Models;
 using System.Collections.Generic;
 
-namespace Poker.Unit.Tests.Models.Interfaces
+namespace Poker.Unit.Tests.Models.Testers.Interfaces
 {
     public interface IHandTester
     {

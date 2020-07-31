@@ -73,7 +73,7 @@
     <Compile Include="Models\GroupedValueTests.cs" />
     <Compile Include="Models\DeckTests.cs" />
     <Compile Include="Models\CardTests.cs" />
-    <Compile Include="Models\Interfaces\IHandTester.cs" />
+    <Compile Include="Models\Testers\Interfaces\IHandTester.cs" />
     <Compile Include="Models\Testers\HandTester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
