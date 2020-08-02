@@ -1,4 +1,4 @@
-using Poker.Enums;
+﻿using Poker.Enums;
 using Poker.Exceptions;
 using Poker.Models;
 using Poker.Services.Interfaces;
@@ -86,6 +86,7 @@ namespace Poker.Services
                             var maxValue = winningHands.Select(x => x.GroupedValues.Single(y => y.Count == 4).Value).Max();
                             winningHands = winningHands.Where(x => x.GroupedValues.Single(y => y.Count == 4).Value == maxValue).ToList();
 
+                            //Should return Max 1 record
                             break;
                         }
 
@@ -95,6 +96,7 @@ namespace Poker.Services
                             var maxValue = winningHands.Select(x => x.GroupedValues.Single(y => y.Count == 3).Value).Max();
                             winningHands = winningHands.Where(x => x.GroupedValues.Single(y => y.Count == 3).Value == maxValue).ToList();
 
+                            //Should return Max 1 record
                             break;
                         }
 
@@ -118,6 +120,7 @@ namespace Poker.Services
                                 GetWinningHandsByFilteringOneOfEachKind(1, ref winningHands);
                             }
 
+                            //Should return Max 2 records
                             break;
                         }
 
@@ -127,6 +130,7 @@ namespace Poker.Services
                             winningHands = winningHands.Where(FilterHandByPairCardValue(maxPairValue)).ToList();
 
                             GetWinningHandsByFilteringOneOfEachKind(3, ref winningHands);
+                            //Should return Max 4 records
                             break;
                         }
                 }
