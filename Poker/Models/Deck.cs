@@ -21,20 +21,26 @@ namespace Poker.Models
         /// <returns></returns>
         public Hand GetHand()
         {
-            var cards = GetCards();
+            var cards = DrawCards(5);
             var hand = new Hand(cards);
 
             return hand;
         }
 
         /// <summary>
-        /// Get set of 5 cards
+        /// Get set of N cards
         /// </summary>
+        /// <param name="cardsToDraw"></param>
         /// <returns></returns>
-        private List<Card> GetCards()
+        private List<Card> DrawCards(int cardsToDraw)
         {
+            if (cardsToDraw <= 0)
+            {
+                throw new InvalidCardsToDrawValueException(cardsToDraw);
+            }
+
             //Evaluate if there are at least 5 cards for this hand.
-            if (Cards.Count < 5)
+            if (Cards.Count < cardsToDraw)
             {
                 throw new NoCardsLeftException();
             }

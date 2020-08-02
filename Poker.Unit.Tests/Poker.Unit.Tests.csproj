@@ -61,6 +61,7 @@
     <Compile Include="Exceptions\MissingCardsOnHandExceptionTests.cs" />
     <Compile Include="Exceptions\InvalidCardValueExceptionTests.cs" />
     <Compile Include="Exceptions\MissingWinningHandsExceptionTests.cs" />
+    <Compile Include="Exceptions\InvalidCardsToDrawValueExceptionTests.cs" />
     <Compile Include="Exceptions\RepeatedCardsExceptionTests.cs" />
     <Compile Include="Exceptions\NoCardsLeftExceptionTests.cs" />
     <Compile Include="Extensions\EnumExtensionsTests.cs" />
