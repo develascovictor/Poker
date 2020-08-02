@@ -79,7 +79,8 @@
     <Compile Include="Services\PokerServiceTests.cs" />
     <Compile Include="Services\Testers\Collections\Cards.cs" />
     <Compile Include="Services\Testers\Collections\Hands.cs" />
-    <Compile Include="Services\Testers\GetWinningHandsTester.cs" />
+    <Compile Include="Services\Testers\GetMultipleWinningHandsTester.cs" />
+    <Compile Include="Services\Testers\GetSingleWinningHandTester.cs" />
     <Compile Include="Services\Testers\Interfaces\IGetWinningHandsTester.cs" />
   </ItemGroup>
   <ItemGroup>
