@@ -1,99 +1,48 @@
 ﻿using NUnit.Framework;
-using Poker.Extensions;
 using Poker.Models;
-using Poker.Services.Interfaces;
-using Poker.Unit.Tests.Services.Testers.Interfaces;
-using System;
+using Poker.Unit.Tests.Services.Testers.Base;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Poker.Unit.Tests.Services.Testers
 {
-    public class GetMultipleWinningHandsTester : IGetWinningHandsTester<List<Hand>>
+    public class GetMultipleWinningHandsTester : BaseGetWinningHandTester<List<Hand>>
     {
-        /// <summary>
-        /// Description
-        /// </summary>
-        public string Description { get; set; }
-
-        /// <summary>
-        /// Test case
-        /// </summary>
-        public List<Hand> Hands { get; set; }
-
-        /// <summary>
-        /// Expected result
-        /// </summary>
-        public List<Hand> ExpectedResult { get; set; }
-
-        public void RunGetWinningHands(IPokerService pokerService)
+        protected override void ValidateGetWinningHands(List<Hand> winningHands)
         {
-            var errorMessage = ErrorMessage();
+            Assert.IsNotEmpty(winningHands);
+            Assert.AreEqual(ExpectedResult.Count, winningHands.Count);
 
-            try
+            for (var i = 0; i < ExpectedResult.Count; i++)
             {
-                ValidateInitialProperties(pokerService);
+                var winningHand = winningHands[i];
+                Assert.IsNotNull(winningHand, $"Hand is null. [i: {i}]");
+                Assert.IsNotEmpty(winningHand.Cards, $"Hand's cards is null. [i: {i}]");
+                Assert.AreEqual(5, winningHand.Cards.Count, $"Hand's cards count doesn't match. [i: {i}]");
 
-                var winningHands = pokerService.GetWinningHands(Hands).ToList();
-                Assert.IsNotEmpty(winningHands, errorMessage);
-                Assert.AreEqual(ExpectedResult.Count, winningHands.Count, errorMessage);
-
-                for (var i = 0; i < ExpectedResult.Count; i++)
+                for (var j = 0; j < 5; j++)
                 {
-                    var winningHand = winningHands[i];
-                    Assert.IsNotNull(winningHand, errorMessage);
-                    Assert.IsNotEmpty(winningHand.Cards, errorMessage);
-                    Assert.AreEqual(5, winningHand.Cards.Count, errorMessage);
-
-                    for (var j = 0; j < 5; j++)
-                    {
-                        Assert.IsNotNull(winningHand.Cards[j], $"Card is null. [i: {j}] [i: {j}]\n\n{errorMessage}");
-                        Assert.AreEqual(ExpectedResult[i].Cards[j].Suit, winningHand.Cards[j].Suit, GetIterationError(nameof(Card.Suit), i, j));
-                        Assert.AreEqual(ExpectedResult[i].Cards[j].Value, winningHand.Cards[j].Value, GetIterationError(nameof(Card.Value), i, j));
-                    }
+                    Assert.IsNotNull(winningHand.Cards[j], $"Card is null. [i: {i}] [j: {j}]");
+                    Assert.AreEqual(ExpectedResult[i].Cards[j].Suit, winningHand.Cards[j].Suit, GetIterationError(nameof(Card.Suit), i, j));
+                    Assert.AreEqual(ExpectedResult[i].Cards[j].Value, winningHand.Cards[j].Value, GetIterationError(nameof(Card.Value), i, j));
                 }
-            }
-
-            catch (Exception e)
-            {
-                throw new Exception(errorMessage, e);
             }
         }
 
-        private void ValidateInitialProperties(IPokerService pokerService)
+        protected override void ValidateExpectedResult()
         {
-            var errorMessage = ErrorMessage();
-            Assert.IsNotEmpty(Hands, errorMessage);
-
-            for (var i = 0; i < Hands.Count; i++)
-            {
-                Assert.IsNotNull(Hands[i], errorMessage);
-                Assert.IsNotEmpty(Hands[i].Cards, errorMessage);
-                Assert.AreEqual(5, Hands[i].Cards.Count, errorMessage);
-                Assert.IsTrue(Hands[i].Cards.All(x => x != null), errorMessage);
-            }
-
             Assert.IsNotEmpty(ExpectedResult);
 
             for (var i = 0; i < ExpectedResult.Count; i++)
             {
-                Assert.IsNotNull(ExpectedResult[i], errorMessage);
-                Assert.IsNotEmpty(ExpectedResult[i].Cards, errorMessage);
-                Assert.AreEqual(5, ExpectedResult[i].Cards.Count, errorMessage);
-                Assert.IsTrue(ExpectedResult[i].Cards.All(x => x != null), errorMessage);
+                var expectedResult = ExpectedResult[i];
+                Assert.IsNotNull(expectedResult, $"Expected Result is null. [i: {i}]");
+                Assert.IsNotEmpty(expectedResult.Cards, $"Expected Result's cards is null. [i: {i}]");
+                Assert.AreEqual(5, expectedResult.Cards.Count, $"Expected Result's cards count doesn't match. [i: {i}]");
+                Assert.IsTrue(expectedResult.Cards.All(x => x != null), $"Expected Result's cards has a null record. [i: {i}]");
             }
-
-            Assert.IsNotNull(pokerService, errorMessage);
         }
 
-        private string GetIterationError(string concept, int i, int j) => $"{concept} don't match. [i: {i}] [i: {j}]\n\n{ErrorMessage()}";
-
-        private string ErrorMessage()
-        {
-            var testCase = Hands.Stringify();
-            var expectedResult = ExpectedResult.Stringify();
-
-            return $"Description: {Description}\n\nTest Case:\n{testCase}\n\nExpected Result:\n{expectedResult}";
-        }
+        private string GetIterationError(string concept, int i, int j) => $"\"{concept}\" doesn't match. [i: {i}] [j: {j}]";
     }
 }
