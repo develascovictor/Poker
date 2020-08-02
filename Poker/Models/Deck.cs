@@ -39,7 +39,7 @@ namespace Poker.Models
                 throw new InvalidCardsToDrawValueException(cardsToDraw);
             }
 
-            //Evaluate if there are at least 5 cards for this hand.
+            //Evaluate if there are at least N cards to draw
             if (Cards.Count < cardsToDraw)
             {
                 throw new NoCardsLeftException();
@@ -49,7 +49,7 @@ namespace Poker.Models
             var random = new Random();
             var hand = new List<Card>();
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < cardsToDraw; i++)
             {
                 index = random.Next(0, Cards.Count - 1);
                 hand.Add(new Card(Cards[index].Suit, Cards[index].Value));
