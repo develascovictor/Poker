@@ -1,4 +1,4 @@
-﻿using Poker.Enums;
+using Poker.Enums;
 using Poker.Exceptions;
 using Poker.Models;
 using Poker.Services.Interfaces;
@@ -21,16 +21,21 @@ namespace Poker.Services
 
             var highestRank = hands.Max(h => h.Rank);
             var winningHands = hands.Where(r => r.Rank == highestRank).ToList();
-
             winningHands = ValidateTieBreaks(winningHands, highestRank);
+
             return winningHands;
         }
 
         private static void ValidateWinningHands(IReadOnlyCollection<Hand> hands)
         {
-            if (hands?.Any() == false)
+            if (hands?.Any() != true)
             {
                 throw new MissingWinningHandsException();
+            }
+
+            if (hands.Any(x => x == null))
+            {
+                throw new HandInWinningHandsNullException(hands);
             }
 
             if (hands.Any(x => x.Cards == null))

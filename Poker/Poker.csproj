@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Enums\Suits.cs" />
     <Compile Include="Enums\Ranks.cs" />
+    <Compile Include="Exceptions\HandInWinningHandsNullException.cs" />
     <Compile Include="Exceptions\CardsInPokerHandIsNotFiveException.cs" />
     <Compile Include="Exceptions\CardInPokerHandIsNullException.cs" />
     <Compile Include="Exceptions\MissingCardsOnHandException.cs" />
