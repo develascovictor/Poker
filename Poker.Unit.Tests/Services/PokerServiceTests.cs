@@ -1,4 +1,6 @@
 ﻿using NUnit.Framework;
+using Poker.Enums;
+using Poker.Exceptions;
 using Poker.Models;
 using Poker.Services;
 using Poker.Services.Interfaces;
@@ -31,6 +33,70 @@ namespace Poker.Unit.Tests.Services
         public void ShouldGetMultipleWinningHand(IGetWinningHandsTester<List<Hand>> tester)
         {
             tester.RunGetWinningHands(_pokerService);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void ShouldThrowMissingWinningHandsExceptionOnGetWinningHands(bool isNull)
+        {
+            Assert.Throws<MissingWinningHandsException>(() => _pokerService.GetWinningHands(isNull ? null : new List<Hand>()));
+        }
+
+        [Test]
+        public void ShouldThrowHandInWinningHandsNullExceptionOnGetWinningHands()
+        {
+            Assert.Throws<HandInWinningHandsNullException>(() => _pokerService.GetWinningHands(new List<Hand> { null, new Hand(null) }));
+        }
+
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(3)]
+        [TestCase(4)]
+        [TestCase(6)]
+        [TestCase(7)]
+        public void ShouldThrowCardsInPokerHandIsNotFiveExceptionOnGetWinningHands(int numberOfRecords)
+        {
+            var cards = new List<Card>();
+
+            for (var i = 0; i < numberOfRecords; i++)
+            {
+                cards.Add(new Card(Suits.Club, 2));
+            }
+
+            Assert.Throws<CardsInPokerHandIsNotFiveException>(() => _pokerService.GetWinningHands(new List<Hand> { new Hand(cards) }));
+        }
+
+        [Test]
+        public void ShouldThrowMissingCardsOnHandExceptionWithNullCardsOnGetWinningHands()
+        {
+            Assert.Throws<CardsInPokerHandIsNotFiveException>(() => _pokerService.GetWinningHands(new List<Hand> { new Hand(null) }));
+        }
+
+        public void ShouldThrowCardInPokerHandIsNullExceptionOnGetWinningHands(int numberOfRecords)
+        {
+            var cards = new List<Card>
+            {
+                new Card(Suits.Club, 2),
+                new Card(Suits.Club, 2),
+                new Card(Suits.Club, 2),
+                new Card(Suits.Club, 2),
+                null
+            };
+            Assert.Throws<CardInPokerHandIsNullException>(() => _pokerService.GetWinningHands(new List<Hand> { new Hand(cards) }));
+        }
+
+        public void ShouldThrowRepeatedCardsExceptionOnGetWinningHands(int numberOfRecords)
+        {
+            var cards = new List<Card>
+            {
+                new Card(Suits.Club, 2),
+                new Card(Suits.Club, 3),
+                new Card(Suits.Heart, 3),
+                new Card(Suits.Heart, 2),
+                new Card(Suits.Club, 2),
+            };
+            Assert.Throws<RepeatedCardsException>(() => _pokerService.GetWinningHands(new List<Hand> { new Hand(cards) }));
         }
 
         private static IEnumerable<IGetWinningHandsTester<Hand>> GetSingleWinningHandTestCases()
