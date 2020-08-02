@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,12 +44,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\Suits.cs" />
+    <Compile Include="Enums\Ranks.cs" />
+    <Compile Include="Exceptions\HandInWinningHandsNullException.cs" />
+    <Compile Include="Exceptions\CardsInPokerHandIsNotFiveException.cs" />
+    <Compile Include="Exceptions\CardInPokerHandIsNullException.cs" />
+    <Compile Include="Exceptions\MissingCardsOnHandException.cs" />
+    <Compile Include="Exceptions\MissingWinningHandsException.cs" />
+    <Compile Include="Exceptions\InvalidCardValueException.cs" />
+    <Compile Include="Exceptions\RepeatedCardsException.cs" />
+    <Compile Include="Exceptions\NoCardsLeftException.cs" />
+    <Compile Include="Extensions\HandExtensions.cs" />
+    <Compile Include="Extensions\JsonExtensions.cs" />
+    <Compile Include="Services\Interfaces\IPokerService.cs" />
+    <Compile Include="Models\Card.cs" />
+    <Compile Include="Models\Deck.cs" />
+    <Compile Include="Models\GroupedSuit.cs" />
+    <Compile Include="Models\GroupedValue.cs" />
+    <Compile Include="Models\Hand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Extensions\EnumExtensions.cs" />
+    <Compile Include="Services\PokerService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
