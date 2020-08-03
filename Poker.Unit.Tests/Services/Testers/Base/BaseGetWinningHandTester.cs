@@ -29,13 +29,14 @@ namespace Poker.Unit.Tests.Services.Testers.Base
 
         protected abstract void ValidateExpectedResult();
 
-        public void RunGetWinningHands(ICardGameService pokerService)
+        public void RunGetWinningHands(ICardGameService cardGameService)
         {
             try
             {
-                ValidateInitialProperties(pokerService);
+                ValidateInitialProperties(cardGameService);
+                ValidateExpectedResult();
 
-                var winningHands = pokerService.GetWinningHands(Hands).ToList();
+                var winningHands = cardGameService.GetWinningHands(Hands).ToList();
                 ValidateGetWinningHands(winningHands);
             }
 
@@ -46,7 +47,7 @@ namespace Poker.Unit.Tests.Services.Testers.Base
             }
         }
 
-        private void ValidateInitialProperties(ICardGameService pokerService)
+        private void ValidateInitialProperties(ICardGameService cardGameService)
         {
             Assert.IsNotEmpty(Hands);
 
@@ -60,7 +61,7 @@ namespace Poker.Unit.Tests.Services.Testers.Base
                 Assert.IsTrue(cards.All(x => x != null));
             }
 
-            Assert.IsNotNull(pokerService);
+            Assert.IsNotNull(cardGameService);
         }
     }
 }
