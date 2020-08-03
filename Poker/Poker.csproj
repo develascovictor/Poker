@@ -58,7 +58,8 @@
     <Compile Include="Exceptions\NoCardsLeftException.cs" />
     <Compile Include="Extensions\HandExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
-    <Compile Include="Services\Interfaces\IPokerService.cs" />
+    <Compile Include="Services\Base\BaseCardGameService.cs" />
+    <Compile Include="Services\Interfaces\ICardGameService.cs" />
     <Compile Include="Models\Card.cs" />
     <Compile Include="Models\Deck.cs" />
     <Compile Include="Models\GroupedSuit.cs" />

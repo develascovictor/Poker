@@ -36,7 +36,6 @@ namespace Poker.Unit.Tests.Models
         }
 
         //TODO: Migrate to HandTester
-        //TODO: Validate if _cards is not updated with GetCards
         [Test]
         public void ShouldGetCards()
         {

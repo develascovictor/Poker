@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Poker.Services.Interfaces
 {
-    public interface IPokerService
+    public interface ICardGameService
     {
         /// <summary>
         /// Get hand of cards

@@ -29,7 +29,7 @@ namespace Poker.Unit.Tests.Services.Testers.Base
 
         protected abstract void ValidateExpectedResult();
 
-        public void RunGetWinningHands(IPokerService pokerService)
+        public void RunGetWinningHands(ICardGameService pokerService)
         {
             try
             {
@@ -46,7 +46,7 @@ namespace Poker.Unit.Tests.Services.Testers.Base
             }
         }
 
-        private void ValidateInitialProperties(IPokerService pokerService)
+        private void ValidateInitialProperties(ICardGameService pokerService)
         {
             Assert.IsNotEmpty(Hands);
 

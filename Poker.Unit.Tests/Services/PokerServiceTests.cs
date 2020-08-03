@@ -16,7 +16,7 @@ namespace Poker.Unit.Tests.Services
     [Parallelizable(ParallelScope.Fixtures)]
     public class PokerServiceTests
     {
-        private IPokerService _pokerService;
+        private ICardGameService _pokerService;
 
         [SetUp]
         public void SetUp()
