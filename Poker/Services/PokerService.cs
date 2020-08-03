@@ -10,6 +10,25 @@ namespace Poker.Services
 {
     public class PokerService : IPokerService
     {
+        private readonly Deck _deck;
+
+        public PokerService()
+        {
+            _deck = new Deck();
+        }
+
+        /// <summary>
+        /// Get a hand of 5 cards with validated rank
+        /// </summary>
+        /// <returns></returns>
+        public Hand GetHand()
+        {
+            var cards = _deck.DrawCards(5);
+            var hand = new Hand(cards);
+
+            return hand;
+        }
+
         /// <summary>
         /// Get winning hand from a list of hands
         /// </summary>
@@ -24,6 +43,14 @@ namespace Poker.Services
             winningHands = ValidateTieBreaks(winningHands, highestRank);
 
             return winningHands;
+        }
+
+        /// <summary>
+        /// Reset service so a game can start from the beggining
+        /// </summary>
+        public void RestartGame()
+        {
+            _deck.FillCards();
         }
 
         private static void ValidateWinningHands(IReadOnlyCollection<Hand> hands)

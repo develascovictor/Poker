@@ -12,45 +12,48 @@ namespace Poker.Unit.Tests.Models
     [TestFixture]
     public class DeckTests : BaseModelTests<Deck>
     {
-        const int HandSize = 5;
-
-        [TestCase(nameof(Deck.Cards))]
-        public void ShouldValidatePrivateSettableProperty(string propertyName)
-        {
-            ValidatePrivateSettableProperty(propertyName);
-        }
-
         [Test]
         public void ShouldInstantiateEmptyConstructor()
         {
             var deck = new Deck();
-            var cards = GetDeckOfCards();
-
-            Assert.IsNotEmpty(deck.Cards);
-            Assert.AreEqual(cards.Count, deck.Cards.Count);
-
-            for (var i = 0; i < cards.Count; i++)
-            {
-                Assert.AreEqual(cards[i].Suit, deck.Cards[i].Suit, GetIterationError(nameof(Card.Suit), i));
-                Assert.AreEqual(cards[i].Value, deck.Cards[i].Value, GetIterationError(nameof(Card.Value), i));
-            }
         }
 
         [Test]
-        public void ShouldGetHand()
+        public void ShouldGetCopyOfRemainingDeck()
         {
             var deck = new Deck();
-            var deckSize = deck.Cards.Count();
+            var actualDeckOfCards = deck.GetCopyOfRemainingCardsInDeck().ToList();
+            var expectedDeckOfCards = GetDeckOfCards();
 
-            var firstHand = deck.GetHand();
-            ValidateHandAndDeck(firstHand, deck, deckSize, 1);
+            Assert.IsNotEmpty(actualDeckOfCards);
+            Assert.AreEqual(expectedDeckOfCards.Count, actualDeckOfCards.Count);
 
-            var secondHand = deck.GetHand();
-            ValidateHandAndDeck(secondHand, deck, deckSize, 2);
-
-            foreach (Card card in firstHand.Cards)
+            for (var i = 0; i < expectedDeckOfCards.Count; i++)
             {
-                Assert.IsFalse(secondHand.Cards.Any(x => x.Suit == card.Suit && x.Value == card.Value));
+                Assert.AreEqual(expectedDeckOfCards[i].Suit, actualDeckOfCards[i].Suit, GetIterationError(nameof(Card.Suit), i));
+                Assert.AreEqual(expectedDeckOfCards[i].Value, actualDeckOfCards[i].Value, GetIterationError(nameof(Card.Value), i));
+            }
+        }
+
+        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(3)]
+        [TestCase(4)]
+        [TestCase(5)]
+        public void ShouldDrawCards(int handSize)
+        {
+            var deck = new Deck();
+            var deckSize = deck.GetCopyOfRemainingCardsInDeck().Count();
+
+            var firstSetOfCards = deck.DrawCards(handSize);
+            ValidateHandAndDeck(firstSetOfCards, deck, handSize, deckSize, 1);
+
+            var secondSetOfCards = deck.DrawCards(handSize);
+            ValidateHandAndDeck(secondSetOfCards, deck, handSize, deckSize, 2);
+
+            foreach (Card card in firstSetOfCards)
+            {
+                Assert.IsFalse(secondSetOfCards.Any(x => x.Suit == card.Suit && x.Value == card.Value));
             }
         }
 
@@ -58,27 +61,34 @@ namespace Poker.Unit.Tests.Models
         public void ShouldThrowNoCardsLeftExceptionOnGetHand()
         {
             var deck = new Deck();
-            var deckSize = deck.Cards.Count() - 2;
-            var neededIterations = deckSize / HandSize;
+            var deckSize = deck.GetCopyOfRemainingCardsInDeck().Count();
+            deck.DrawCards(deckSize);
 
-            for (var i = 0; i < neededIterations; i++)
-            {
-                deck.GetHand();
-            }
-
-            Assert.Throws<NoCardsLeftException>(() => deck.GetHand());
+            Assert.Throws<NoCardsLeftException>(() => deck.DrawCards(1));
         }
 
-        private void ValidateHandAndDeck(Hand hand, Deck deck, int initialDeckSize, int iterations)
+        [Test]
+        public void ShouldFillCards()
         {
-            Assert.IsNotNull(hand);
-            Assert.IsNotEmpty(hand.Cards);
-            Assert.AreEqual(HandSize, hand.Cards.Count());
-            Assert.AreEqual(initialDeckSize - (HandSize * iterations), deck.Cards.Count());
+            var deck = new Deck();
+            var deckSize = deck.GetCopyOfRemainingCardsInDeck().Count();
+            deck.DrawCards(deckSize);
+            deck.FillCards();
 
-            foreach (Card card in hand.Cards)
+            ShouldGetCopyOfRemainingDeck();
+        }
+
+        private void ValidateHandAndDeck(IReadOnlyCollection<Card> cards, Deck deck, int handSize, int initialDeckSize, int iterations)
+        {
+            var remainingCards = deck.GetCopyOfRemainingCardsInDeck();
+            Assert.IsNotEmpty(cards);
+            Assert.AreEqual(handSize, cards.Count());
+            Assert.AreEqual(initialDeckSize - (handSize * iterations), remainingCards.Count());
+            Assert.IsTrue(cards.GroupBy(x => new { x.Suit, x.Value }).All(x => x.Count() == 1));
+
+            foreach (Card card in cards)
             {
-                Assert.IsFalse(deck.Cards.Any(x => x.Suit == card.Suit && x.Value == card.Value));
+                Assert.IsFalse(remainingCards.Any(x => x.Suit == card.Suit && x.Value == card.Value));
             }
         }
 
