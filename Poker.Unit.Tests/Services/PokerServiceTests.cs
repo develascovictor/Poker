@@ -29,10 +29,12 @@ namespace Poker.Unit.Tests.Services
         {
             var hand = _pokerService.GetHand();
             Assert.IsNotNull(hand);
-            Assert.IsNotEmpty(hand.Cards);
-            Assert.AreEqual(5, hand.Cards.Count);
-            Assert.IsTrue(hand.Cards.All(x => x != null));
-            Assert.IsTrue(hand.Cards.GroupBy(x => new { x.Suit, x.Value }).All(x => x.Count() == 1));
+
+            var cards = hand.GetCards();
+            Assert.IsNotEmpty(cards);
+            Assert.AreEqual(5, cards.Count);
+            Assert.IsTrue(cards.All(x => x != null));
+            Assert.IsTrue(cards.GroupBy(x => new { x.Suit, x.Value }).All(x => x.Count() == 1));
         }
 
         [TestCaseSource(nameof(GetSingleWinningHandTestCases))]

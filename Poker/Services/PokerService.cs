@@ -65,26 +65,26 @@ namespace Poker.Services
                 throw new HandInWinningHandsNullException(hands);
             }
 
-            if (hands.Any(x => x.Cards == null))
+            if (hands.Any(x => x.GetCards() == null))
             {
                 throw new MissingCardsOnHandException();
             }
 
-            Func<Hand, bool> ifCardsIsNot5 = x => x.Cards.Count != 5;
+            Func<Hand, bool> ifCardsIsNot5 = x => x.GetCards().Count != 5;
 
             if (hands.Any(ifCardsIsNot5))
             {
                 throw new CardsInPokerHandIsNotFiveException(hands.First(ifCardsIsNot5));
             }
 
-            Func<Hand, bool> ifAnyCardIsNull = x => x.Cards.Any(y => y == null);
+            Func<Hand, bool> ifAnyCardIsNull = x => x.GetCards().Any(y => y == null);
 
             if (hands.Any(ifAnyCardIsNull))
             {
                 throw new CardInPokerHandIsNullException(hands.First(ifAnyCardIsNull));
             }
 
-            var repeatedGroups = hands.SelectMany(x => x.Cards).GroupBy(x => new { x.Suit, x.Value }).Where(x => x.Count() > 1).ToList();
+            var repeatedGroups = hands.SelectMany(x => x.GetCards()).GroupBy(x => new { x.Suit, x.Value }).Where(x => x.Count() > 1).ToList();
 
             if (repeatedGroups.Any())
             {
@@ -189,9 +189,9 @@ namespace Poker.Services
             return max;
         }
 
-        private static Func<Hand, bool> FilterHandByCardValue(int value) => x => x.Cards.Any(y => y.Value == value);
+        private static Func<Hand, bool> FilterHandByCardValue(int value) => x => x.GetCards().Any(y => y.Value == value);
         private static Func<Hand, bool> FilterHandByPairCardValue(int pairValue) => x => x.GroupedValues.Where(y => y.Count == 2).Any(y => y.Value == pairValue);
         private static Func<Hand, IEnumerable<int>> SelectValuesFromOneOfEachKind() => x => x.GroupedValues.Where(y => y.Count == 1).Select(y => y.Value);
-        private static Func<Hand, IEnumerable<int>> SelectValuesFromStraight() => x => x.Cards.Select(y => y.Value == 14 ? (x.Cards.Any(z => z.Value == 13) ? 14 : 1) : y.Value);
+        private static Func<Hand, IEnumerable<int>> SelectValuesFromStraight() => x => x.GetCards().Select(y => y.Value == 14 ? (x.GetCards().Any(z => z.Value == 13) ? 14 : 1) : y.Value);
     }
 }

@@ -22,13 +22,14 @@ namespace Poker.Unit.Tests.Models.Testers
             var serializedCards = (Cards ?? new List<Card>()).Where(x => x != null).ToList();
             var errorMessage = ErrorMessage();
 
-            Assert.IsNotNull(hand.Cards, errorMessage);
-            Assert.AreEqual(serializedCards.Count, hand.Cards.Count, errorMessage);
+            var cards = hand.GetCards().ToList();
+            Assert.IsNotNull(cards, errorMessage);
+            Assert.AreEqual(serializedCards.Count, cards.Count, errorMessage);
 
             for (var i = 0; i < serializedCards.Count; i++)
             {
-                Assert.AreEqual(serializedCards[i].Suit, hand.Cards[i].Suit, GetIterationError(nameof(Card.Suit), i));
-                Assert.AreEqual(serializedCards[i].Value, hand.Cards[i].Value, GetIterationError(nameof(Card.Value), i));
+                Assert.AreEqual(serializedCards[i].Suit, cards[i].Suit, GetIterationError(nameof(Card.Suit), i));
+                Assert.AreEqual(serializedCards[i].Value, cards[i].Value, GetIterationError(nameof(Card.Value), i));
             }
 
             var groupedBySuits = GetGroupedSuits(serializedCards);

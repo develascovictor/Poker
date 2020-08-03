@@ -53,9 +53,11 @@ namespace Poker.Unit.Tests.Services.Testers.Base
             for (var i = 0; i < Hands.Count; i++)
             {
                 Assert.IsNotNull(Hands[i]);
-                Assert.IsNotEmpty(Hands[i].Cards);
-                Assert.AreEqual(5, Hands[i].Cards.Count);
-                Assert.IsTrue(Hands[i].Cards.All(x => x != null));
+
+                var cards = Hands[i].GetCards();
+                Assert.IsNotEmpty(cards);
+                Assert.AreEqual(5, cards.Count);
+                Assert.IsTrue(cards.All(x => x != null));
             }
 
             Assert.IsNotNull(pokerService);

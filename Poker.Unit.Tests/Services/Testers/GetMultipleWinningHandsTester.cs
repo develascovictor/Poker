@@ -17,14 +17,18 @@ namespace Poker.Unit.Tests.Services.Testers
             {
                 var winningHand = winningHands[i];
                 Assert.IsNotNull(winningHand, $"Hand is null. [i: {i}]");
-                Assert.IsNotEmpty(winningHand.Cards, $"Hand's cards is null. [i: {i}]");
-                Assert.AreEqual(5, winningHand.Cards.Count, $"Hand's cards count doesn't match. [i: {i}]");
+
+                var cards = winningHand.GetCards().ToList();
+                Assert.IsNotEmpty(cards, $"Hand's cards is null. [i: {i}]");
+                Assert.AreEqual(5, cards.Count, $"Hand's cards count doesn't match. [i: {i}]");
 
                 for (var j = 0; j < 5; j++)
                 {
-                    Assert.IsNotNull(winningHand.Cards[j], $"Card is null. [i: {i}] [j: {j}]");
-                    Assert.AreEqual(ExpectedResult[i].Cards[j].Suit, winningHand.Cards[j].Suit, GetIterationError(nameof(Card.Suit), i, j));
-                    Assert.AreEqual(ExpectedResult[i].Cards[j].Value, winningHand.Cards[j].Value, GetIterationError(nameof(Card.Value), i, j));
+                    Assert.IsNotNull(cards[j], $"Card is null. [i: {i}] [j: {j}]");
+
+                    var expectedCards = ExpectedResult[i].GetCards().ToList();
+                    Assert.AreEqual(expectedCards[j].Suit, cards[j].Suit, GetIterationError(nameof(Card.Suit), i, j));
+                    Assert.AreEqual(expectedCards[j].Value, cards[j].Value, GetIterationError(nameof(Card.Value), i, j));
                 }
             }
         }
@@ -37,9 +41,11 @@ namespace Poker.Unit.Tests.Services.Testers
             {
                 var expectedResult = ExpectedResult[i];
                 Assert.IsNotNull(expectedResult, $"Expected Result is null. [i: {i}]");
-                Assert.IsNotEmpty(expectedResult.Cards, $"Expected Result's cards is null. [i: {i}]");
-                Assert.AreEqual(5, expectedResult.Cards.Count, $"Expected Result's cards count doesn't match. [i: {i}]");
-                Assert.IsTrue(expectedResult.Cards.All(x => x != null), $"Expected Result's cards has a null record. [i: {i}]");
+
+                var expectedCards = expectedResult.GetCards();
+                Assert.IsNotEmpty(expectedCards, $"Expected Result's cards is null. [i: {i}]");
+                Assert.AreEqual(5, expectedCards.Count, $"Expected Result's cards count doesn't match. [i: {i}]");
+                Assert.IsTrue(expectedCards.All(x => x != null), $"Expected Result's cards has a null record. [i: {i}]");
             }
         }
 

@@ -5,13 +5,13 @@ using Poker.Unit.Tests.Models.Base;
 using Poker.Unit.Tests.Models.Testers;
 using Poker.Unit.Tests.Models.Testers.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Poker.Unit.Tests.Models
 {
     [TestFixture]
     public class HandTests : BaseModelTests<Hand>
     {
-        [TestCase(nameof(Hand.Cards))]
         [TestCase(nameof(Hand.Rank))]
         [TestCase(nameof(Hand.Details))]
         [TestCase(nameof(Hand.GroupedSuits))]
@@ -31,6 +31,29 @@ namespace Poker.Unit.Tests.Models
         public void ShouldThrowRepeatedCardsExceptionOnConstructor(IHandTester tester)
         {
             tester.RunShouldThrowRepeatedCardsExceptionOnConstructor();
+        }
+
+        //TODO: Migrate to HandTester
+        //TODO: Validate if _cards is not updated with GetCards
+        [Test]
+        public void ShouldGetCards()
+        {
+            var expectedCards = new List<Card>
+            {
+                new Card(Suits.Club, 4),
+                new Card(Suits.Heart, 5)
+            };
+            var hand = new Hand(expectedCards);
+
+            var actualCards = hand.GetCards().ToList();
+            Assert.IsNotEmpty(actualCards);
+            //Validate if not null
+
+            for (var i = 0; i < expectedCards.Count; i++)
+            {
+                //Assert.AreEqual(expectedCards[i].Suit, actualCards[i].Suit, GetIterationError(nameof(Card.Suit), i));
+                //Assert.AreEqual(expectedCards[i].Value, actualCards[i].Value, GetIterationError(nameof(Card.Value), i));
+            }
         }
 
         private static IEnumerable<IHandTester> TestCases()

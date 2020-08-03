@@ -2,14 +2,13 @@
 using Poker.Exceptions;
 using Poker.Extensions;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 
 namespace Poker.Models
 {
     public class Hand
     {
-        public IList<Card> Cards { get; private set; }
+        private readonly IReadOnlyCollection<Card> _cards;
 
         public Ranks Rank { get; private set; }
 
@@ -21,21 +20,21 @@ namespace Poker.Models
 
         public Hand(IEnumerable<Card> cards)
         {
-            Cards = (cards ?? new List<Card>()).Where(x => x != null).ToList();
+            _cards = (cards ?? new List<Card>()).Where(x => x != null).ToList();
 
-            if (!Cards.GroupBy(x => new { x.Suit, x.Value }).All(x => x.Count() == 1))
+            if (!_cards.GroupBy(x => new { x.Suit, x.Value }).All(x => x.Count() == 1))
             {
                 throw new RepeatedCardsException(cards);
             }
 
             GroupedSuits =
-                Cards
+                _cards
                 .GroupBy(c => c.Suit)
                 .Select(c => new GroupedSuit { Suit = c.Key, Count = c.Count() })
                 .OrderByDescending(c => c.Count)
                 .ToList();
             GroupedValues =
-                Cards
+                _cards
                 .GroupBy(c => c.Value)
                 .Select(c => new GroupedValue { Value = c.Key, Count = c.Count() })
                 .OrderByDescending(c => c.Count)
@@ -47,7 +46,12 @@ namespace Poker.Models
                 "Rank: "
                 + Rank.GetDescription()
                 + "\nCards:"
-                + Cards.Aggregate(string.Empty, (current, card) => current + ("\n\t- " + card.Suit.GetDescription() + " of " + card.Description));
+                + _cards.Aggregate(string.Empty, (current, card) => current + ("\n\t- " + card.Suit.GetDescription() + " of " + card.Description));
+        }
+
+        public IReadOnlyCollection<Card> GetCards()
+        {
+            return _cards;
         }
 
         /// <summary>
@@ -56,7 +60,7 @@ namespace Poker.Models
         /// <returns></returns>
         private Ranks GetRank()
         {
-            if (!Cards.Any())
+            if (!_cards.Any())
             {
                 return Ranks.HighCard;
             }
