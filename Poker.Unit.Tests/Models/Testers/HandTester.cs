@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using Poker.Enums;
+using Poker.Exceptions;
 using Poker.Extensions;
 using Poker.Models;
 using Poker.Unit.Tests.Models.Testers.Interfaces;
@@ -55,6 +56,13 @@ namespace Poker.Unit.Tests.Models.Testers
 
             var details = GetDetails(rank, serializedCards);
             Assert.AreEqual(details, hand.Details, errorMessage);
+        }
+
+        public void RunShouldThrowRepeatedCardsExceptionOnConstructor()
+        {
+            Assert.IsNotEmpty(Cards);
+            Assert.IsTrue(Cards.Where(x => x != null).GroupBy(x => new { x.Suit, x.Value }).Any(x => x.Count() > 1));
+            Assert.Throws<RepeatedCardsException>(() => new Hand(Cards));
         }
 
         private static List<GroupedSuit> GetGroupedSuits(IEnumerable<Card> cards)

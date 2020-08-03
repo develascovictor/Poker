@@ -7,7 +7,7 @@ namespace Poker.Exceptions
 {
     public sealed class RepeatedCardsException : Exception
     {
-        public RepeatedCardsException(IReadOnlyCollection<Card> repeatedCards)
+        public RepeatedCardsException(IEnumerable<Card> repeatedCards)
             : base($"Some cards are repeated. [Repeated Cards: {repeatedCards.Stringify()}]")
         {
         }

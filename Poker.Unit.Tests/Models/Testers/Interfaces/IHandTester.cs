@@ -7,5 +7,6 @@ namespace Poker.Unit.Tests.Models.Testers.Interfaces
     {
         IEnumerable<Card> Cards { get; set; }
         void RunShouldInstantiateConstructorWithParameters();
+        void RunShouldThrowRepeatedCardsExceptionOnConstructor();
     }
 }
