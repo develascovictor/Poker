@@ -32,6 +32,12 @@ namespace Poker.Unit.Tests.Models.Testers
                 Assert.AreEqual(serializedCards[i].Value, cards[i].Value, GetIterationError(nameof(Card.Value), i));
             }
 
+            var expectedValue = GetValue(serializedCards);
+            Assert.AreEqual(expectedValue, hand.Value);
+
+            var expectedCanSplit = serializedCards.Count == 2 && serializedCards.GroupBy(x => x.Value).Any(x => x.Count() == 2);
+            Assert.AreEqual(expectedCanSplit, hand.CanSplit);
+
             var groupedBySuits = GetGroupedSuits(serializedCards);
             var serializedGroupedSuits = hand.GroupedSuits.ToList();
             Assert.AreEqual(groupedBySuits.Count, serializedGroupedSuits.Count, errorMessage);
@@ -64,6 +70,31 @@ namespace Poker.Unit.Tests.Models.Testers
             Assert.IsNotEmpty(Cards);
             Assert.IsTrue(Cards.Where(x => x != null).GroupBy(x => new { x.Suit, x.Value }).Any(x => x.Count() > 1));
             Assert.Throws<RepeatedCardsException>(() => new Hand(Cards));
+        }
+
+        private int GetValue(IEnumerable<Card> cards)
+        {
+            const int maxValue = 21;
+
+            //Get sum from all cards except Ace
+            //If Jack, Queen or King; return 10
+            var value = cards.Where(x => x.Value != 14).Sum(x => x.Value >= 10 && x.Value <= 13 ? 10 : x.Value);
+            var aces = cards.Where(x => x.Value == 14).ToList();
+
+            //If there is at least one Ace
+            if (aces.Any())
+            {
+                if (value + 11 > maxValue)
+                {
+                    //Each ace will count as 1
+                    return value + aces.Count;
+                }
+
+                //Return an ace as 11 and the rest as 1
+                return value + 11 + (aces.Count - 1);
+            }
+
+            return value;
         }
 
         private static List<GroupedSuit> GetGroupedSuits(IEnumerable<Card> cards)

@@ -12,6 +12,8 @@ namespace Poker.Unit.Tests.Models
     [TestFixture]
     public class HandTests : BaseModelTests<Hand>
     {
+        [TestCase(nameof(Hand.Value))]
+        [TestCase(nameof(Hand.CanSplit))]
         [TestCase(nameof(Hand.Rank))]
         [TestCase(nameof(Hand.Details))]
         [TestCase(nameof(Hand.GroupedSuits))]
