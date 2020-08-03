@@ -58,6 +58,7 @@
     <Compile Include="Exceptions\HandInWinningHandsNullExceptionTests.cs" />
     <Compile Include="Exceptions\CardsInPokerHandIsNotFiveExceptionTests.cs" />
     <Compile Include="Exceptions\CardInPokerHandIsNullExceptionTests.cs" />
+    <Compile Include="Exceptions\InvalidDrawOnBustHandExceptionTests.cs" />
     <Compile Include="Exceptions\MissingCardsOnHandExceptionTests.cs" />
     <Compile Include="Exceptions\InvalidCardValueExceptionTests.cs" />
     <Compile Include="Exceptions\MissingWinningHandsExceptionTests.cs" />
