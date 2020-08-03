@@ -8,48 +8,53 @@ namespace Poker.Models
 {
     public class Deck
     {
-        public List<Card> Cards { get; private set; }
+        private readonly Random _random;
+
+        private IList<Card> _cards;
 
         public Deck()
         {
+            _random = new Random();
             FillCards();
         }
 
         /// <summary>
-        /// Get a hand of 5 cards with validated rank
+        /// Get copy of remaining deck. This will not modify the cards in the actual deck.
         /// </summary>
         /// <returns></returns>
-        public Hand GetHand()
+        public IEnumerable<Card> GetCopyOfRemainingCardsInDeck()
         {
-            var cards = GetCards();
-            var hand = new Hand(cards);
-
-            return hand;
+            return _cards.Select(x => x).ToList();
         }
 
         /// <summary>
-        /// Get set of 5 cards
+        /// Get set of N cards
         /// </summary>
+        /// <param name="cardsToDraw"></param>
         /// <returns></returns>
-        private List<Card> GetCards()
+        public List<Card> DrawCards(int cardsToDraw)
         {
-            //Evaluate if there are at least 5 cards for this hand.
-            if (Cards.Count < 5)
+            if (cardsToDraw <= 0)
+            {
+                throw new InvalidCardsToDrawValueException(cardsToDraw);
+            }
+
+            //Evaluate if there are at least N cards to draw
+            if (_cards.Count < cardsToDraw)
             {
                 throw new NoCardsLeftException();
             }
 
-            int index;
-            var random = new Random();
+            var index = 0;
             var hand = new List<Card>();
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < cardsToDraw; i++)
             {
-                index = random.Next(0, Cards.Count - 1);
-                hand.Add(new Card(Cards[index].Suit, Cards[index].Value));
+                index = _random.Next(0, _cards.Count - 1);
+                hand.Add(new Card(_cards[index].Suit, _cards[index].Value));
 
                 //Remove card from deck
-                Cards.RemoveAt(index);
+                _cards.RemoveAt(index);
             }
 
             //Order the cards from lowest to highest value and then order them by suits
@@ -61,10 +66,10 @@ namespace Poker.Models
         /// <summary>
         /// Initial method to fill a deck of cards
         /// </summary>
-        private void FillCards()
+        public void FillCards()
         {
             //Instantiate list
-            Cards = new List<Card>();
+            _cards = new List<Card>();
 
             //Used for iterations
             int i;
@@ -77,7 +82,7 @@ namespace Poker.Models
             {
                 for (i = 2; i <= 14; i++)
                 {
-                    Cards.Add(new Card(suit, i));
+                    _cards.Add(new Card(suit, i));
                 }
             }
         }

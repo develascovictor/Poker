@@ -12,17 +12,18 @@ namespace Poker
         #region Main
         static void Main()
         {
-            //All cards that have been pulled from deck will be stored here
-            var deck = new Deck();
+            //Instantiate Poker service
+            var pokerService = (IPokerService)new PokerService();
 
             //Playing hands
             var hands = new List<Hand>
             {
-                deck.GetHand(),
-                deck.GetHand(),
-                deck.GetHand(),
-                deck.GetHand(),
-                deck.GetHand()
+                pokerService.GetHand(),
+                pokerService.GetHand(),
+                pokerService.GetHand(),
+                pokerService.GetHand(),
+                pokerService.GetHand(),
+                pokerService.GetHand()
             };
 
             #region Console Set
@@ -47,7 +48,6 @@ namespace Poker
 
             Console.WriteLine(hands.GetDetailedHand());
 
-            var pokerService = (IPokerService)new PokerService();
             var winningHands = pokerService.GetWinningHands(hands);
 
             Console.WriteLine(winningHands.GetWinningHandsResultMessage());

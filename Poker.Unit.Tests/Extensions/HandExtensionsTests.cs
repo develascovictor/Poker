@@ -70,7 +70,7 @@ namespace Poker.Unit.Tests.Extensionsc
                         new List<Card>
                         {
                             new Card(Suits.Club, 3),
-                            new Card(Suits.Club, 3)
+                            new Card(Suits.Spade, 3)
                         }
                     )
                 }

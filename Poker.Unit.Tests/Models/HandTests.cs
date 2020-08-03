@@ -27,6 +27,12 @@ namespace Poker.Unit.Tests.Models
             tester.RunShouldInstantiateConstructorWithParameters();
         }
 
+        [TestCaseSource(nameof(InvalidTestCases))]
+        public void ShouldThrowRepeatedCardsExceptionOnConstructor(IHandTester tester)
+        {
+            tester.RunShouldThrowRepeatedCardsExceptionOnConstructor();
+        }
+
         private static IEnumerable<IHandTester> TestCases()
         {
             yield return new HandTester
@@ -85,6 +91,41 @@ namespace Poker.Unit.Tests.Models
             yield return new HandTester
             {
                 Cards = null
+            };
+        }
+
+        private static IEnumerable<IHandTester> InvalidTestCases()
+        {
+            yield return new HandTester
+            {
+                Cards = new List<Card>
+                {
+                    new Card(Suits.Club, 2),
+                    new Card(Suits.Spade, 3),
+                    new Card(Suits.Club, 12),
+                    new Card(Suits.Club, 2),
+                    new Card(Suits.Heart, 13)
+                }
+            };
+            yield return new HandTester
+            {
+                Cards = new List<Card>
+                {
+                    new Card(Suits.Diamond, 5),
+                    new Card(Suits.Diamond, 5),
+                    new Card(Suits.Diamond, 5),
+                    new Card(Suits.Diamond, 5),
+                    new Card(Suits.Diamond, 5)
+                }
+            };
+            yield return new HandTester
+            {
+                Cards = new List<Card>
+                {
+                    new Card(Suits.Diamond, 5),
+                    null,
+                    new Card(Suits.Diamond, 5)
+                }
             };
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Poker.Enums;
+using Poker.Exceptions;
 using Poker.Extensions;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -21,6 +22,11 @@ namespace Poker.Models
         public Hand(IEnumerable<Card> cards)
         {
             Cards = (cards ?? new List<Card>()).Where(x => x != null).ToList();
+
+            if (!Cards.GroupBy(x => new { x.Suit, x.Value }).All(x => x.Count() == 1))
+            {
+                throw new RepeatedCardsException(cards);
+            }
 
             GroupedSuits =
                 Cards

@@ -8,6 +8,7 @@ using Poker.Unit.Tests.Services.Testers;
 using Poker.Unit.Tests.Services.Testers.Collections;
 using Poker.Unit.Tests.Services.Testers.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Poker.Unit.Tests.Services
 {
@@ -21,6 +22,17 @@ namespace Poker.Unit.Tests.Services
         public void SetUp()
         {
             _pokerService = new PokerService();
+        }
+
+        [Test]
+        public void ShouldGetHand()
+        {
+            var hand = _pokerService.GetHand();
+            Assert.IsNotNull(hand);
+            Assert.IsNotEmpty(hand.Cards);
+            Assert.AreEqual(5, hand.Cards.Count);
+            Assert.IsTrue(hand.Cards.All(x => x != null));
+            Assert.IsTrue(hand.Cards.GroupBy(x => new { x.Suit, x.Value }).All(x => x.Count() == 1));
         }
 
         [TestCaseSource(nameof(GetSingleWinningHandTestCases))]
@@ -61,7 +73,7 @@ namespace Poker.Unit.Tests.Services
 
             for (var i = 0; i < numberOfRecords; i++)
             {
-                cards.Add(new Card(Suits.Club, 2));
+                cards.Add(new Card(Suits.Club, i + 2));
             }
 
             Assert.Throws<CardsInPokerHandIsNotFiveException>(() => _pokerService.GetWinningHands(new List<Hand> { new Hand(cards) }));
@@ -73,7 +85,7 @@ namespace Poker.Unit.Tests.Services
             Assert.Throws<CardsInPokerHandIsNotFiveException>(() => _pokerService.GetWinningHands(new List<Hand> { new Hand(null) }));
         }
 
-        public void ShouldThrowCardInPokerHandIsNullExceptionOnGetWinningHands(int numberOfRecords)
+        public void ShouldThrowCardInPokerHandIsNullExceptionOnGetWinningHands()
         {
             var cards = new List<Card>
             {
@@ -86,7 +98,7 @@ namespace Poker.Unit.Tests.Services
             Assert.Throws<CardInPokerHandIsNullException>(() => _pokerService.GetWinningHands(new List<Hand> { new Hand(cards) }));
         }
 
-        public void ShouldThrowRepeatedCardsExceptionOnGetWinningHands(int numberOfRecords)
+        public void ShouldThrowRepeatedCardsExceptionOnGetWinningHands()
         {
             var cards = new List<Card>
             {
@@ -97,6 +109,28 @@ namespace Poker.Unit.Tests.Services
                 new Card(Suits.Club, 2),
             };
             Assert.Throws<RepeatedCardsException>(() => _pokerService.GetWinningHands(new List<Hand> { new Hand(cards) }));
+        }
+
+        [Test]
+        public void ShouldRestartGame()
+        {
+            _pokerService.RestartGame();
+
+            do
+            {
+                try
+                {
+                    _pokerService.GetHand();
+                }
+
+                catch (NoCardsLeftException)
+                {
+                    break;
+                }
+            } while (true);
+
+            _pokerService.RestartGame();
+            Assert.DoesNotThrow(() => _pokerService.GetHand());
         }
 
         private static IEnumerable<IGetWinningHandsTester<Hand>> GetSingleWinningHandTestCases()
