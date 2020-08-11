@@ -2,14 +2,17 @@
 using Poker.Exceptions;
 using Poker.Extensions;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 
 namespace Poker.Models
 {
     public class Hand
     {
-        public IList<Card> Cards { get; private set; }
+        private readonly IReadOnlyCollection<Card> _cards;
+
+        public int Value { get; private set; }
+
+        public bool CanSplit { get; private set; }
 
         public Ranks Rank { get; private set; }
 
@@ -21,21 +24,25 @@ namespace Poker.Models
 
         public Hand(IEnumerable<Card> cards)
         {
-            Cards = (cards ?? new List<Card>()).Where(x => x != null).ToList();
+            _cards = (cards ?? new List<Card>()).Where(x => x != null).ToList();
 
-            if (!Cards.GroupBy(x => new { x.Suit, x.Value }).All(x => x.Count() == 1))
+            if (!_cards.GroupBy(x => new { x.Suit, x.Value }).All(x => x.Count() == 1))
             {
                 throw new RepeatedCardsException(cards);
             }
 
+            Value = GetValue();
+
+            CanSplit = _cards.Count == 2 && _cards.GroupBy(x => x.Value).Any(x => x.Count() == 2);
+
             GroupedSuits =
-                Cards
+                _cards
                 .GroupBy(c => c.Suit)
                 .Select(c => new GroupedSuit { Suit = c.Key, Count = c.Count() })
                 .OrderByDescending(c => c.Count)
                 .ToList();
             GroupedValues =
-                Cards
+                _cards
                 .GroupBy(c => c.Value)
                 .Select(c => new GroupedValue { Value = c.Key, Count = c.Count() })
                 .OrderByDescending(c => c.Count)
@@ -47,7 +54,45 @@ namespace Poker.Models
                 "Rank: "
                 + Rank.GetDescription()
                 + "\nCards:"
-                + Cards.Aggregate(string.Empty, (current, card) => current + ("\n\t- " + card.Suit.GetDescription() + " of " + card.Description));
+                + _cards.Aggregate(string.Empty, (current, card) => current + ("\n\t- " + card.Suit.GetDescription() + " of " + card.Description));
+        }
+
+        /// <summary>
+        /// Obtain cards in hand
+        /// </summary>
+        /// <returns></returns>
+        public IReadOnlyCollection<Card> GetCards()
+        {
+            return _cards;
+        }
+
+        /// <summary>
+        /// Evaluate value
+        /// </summary>
+        /// <returns></returns>
+        private int GetValue()
+        {
+            const int maxValue = 21;
+
+            //Get sum from all cards except Ace
+            //If Jack, Queen or King; return 10
+            var value = _cards.Where(x => x.Value != 14).Sum(x => x.Value >= 10 && x.Value <= 13 ? 10 : x.Value);
+            var aces = _cards.Where(x => x.Value == 14).ToList();
+
+            //If there is at least one Ace
+            if (aces.Any())
+            {
+                if (value + 11 > maxValue)
+                {
+                    //Each ace will count as 1
+                    return value + aces.Count;
+                }
+
+                //Return an ace as 11 and the rest as 1
+                return value + 11 + (aces.Count - 1);
+            }
+
+            return value;
         }
 
         /// <summary>
@@ -56,7 +101,7 @@ namespace Poker.Models
         /// <returns></returns>
         private Ranks GetRank()
         {
-            if (!Cards.Any())
+            if (!_cards.Any())
             {
                 return Ranks.HighCard;
             }

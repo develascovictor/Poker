@@ -4,60 +4,35 @@ using Poker.Exceptions;
 using Poker.Models;
 using Poker.Services;
 using Poker.Services.Interfaces;
+using Poker.Unit.Tests.Services.Base;
 using Poker.Unit.Tests.Services.Testers;
 using Poker.Unit.Tests.Services.Testers.Collections;
 using Poker.Unit.Tests.Services.Testers.Interfaces;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Poker.Unit.Tests.Services
 {
     [TestFixture]
     [Parallelizable(ParallelScope.Fixtures)]
-    public class PokerServiceTests
+    public class PokerServiceTests : BaseCardGameServiceTests<IPokerService>
     {
-        private IPokerService _pokerService;
-
         [SetUp]
         public void SetUp()
         {
-            _pokerService = new PokerService();
-        }
-
-        [Test]
-        public void ShouldGetHand()
-        {
-            var hand = _pokerService.GetHand();
-            Assert.IsNotNull(hand);
-            Assert.IsNotEmpty(hand.Cards);
-            Assert.AreEqual(5, hand.Cards.Count);
-            Assert.IsTrue(hand.Cards.All(x => x != null));
-            Assert.IsTrue(hand.Cards.GroupBy(x => new { x.Suit, x.Value }).All(x => x.Count() == 1));
+            _initialHandCardCount = 5;
+            _cardGameService = new PokerService();
         }
 
         [TestCaseSource(nameof(GetSingleWinningHandTestCases))]
-        public void ShouldGetSingleWinningHand(IGetWinningHandsTester<Hand> tester)
+        public override void ShouldGetSingleWinningHand(IGetWinningHandsTester<Hand> tester)
         {
-            tester.RunGetWinningHands(_pokerService);
+            tester.RunGetWinningHands(_cardGameService);
         }
 
         [TestCaseSource(nameof(GetMultipleWinningHandTestCases))]
-        public void ShouldGetMultipleWinningHand(IGetWinningHandsTester<List<Hand>> tester)
+        public override void ShouldGetMultipleWinningHand(IGetWinningHandsTester<List<Hand>> tester)
         {
-            tester.RunGetWinningHands(_pokerService);
-        }
-
-        [TestCase(true)]
-        [TestCase(false)]
-        public void ShouldThrowMissingWinningHandsExceptionOnGetWinningHands(bool isNull)
-        {
-            Assert.Throws<MissingWinningHandsException>(() => _pokerService.GetWinningHands(isNull ? null : new List<Hand>()));
-        }
-
-        [Test]
-        public void ShouldThrowHandInWinningHandsNullExceptionOnGetWinningHands()
-        {
-            Assert.Throws<HandInWinningHandsNullException>(() => _pokerService.GetWinningHands(new List<Hand> { null, new Hand(null) }));
+            tester.RunGetWinningHands(_cardGameService);
         }
 
         [TestCase(0)]
@@ -76,287 +51,239 @@ namespace Poker.Unit.Tests.Services
                 cards.Add(new Card(Suits.Club, i + 2));
             }
 
-            Assert.Throws<CardsInPokerHandIsNotFiveException>(() => _pokerService.GetWinningHands(new List<Hand> { new Hand(cards) }));
+            Assert.Throws<CardsInPokerHandIsNotFiveException>(() => _cardGameService.GetWinningHands(new List<Hand> { new Hand(cards) }));
         }
 
         [Test]
         public void ShouldThrowMissingCardsOnHandExceptionWithNullCardsOnGetWinningHands()
         {
-            Assert.Throws<CardsInPokerHandIsNotFiveException>(() => _pokerService.GetWinningHands(new List<Hand> { new Hand(null) }));
-        }
-
-        public void ShouldThrowCardInPokerHandIsNullExceptionOnGetWinningHands()
-        {
-            var cards = new List<Card>
-            {
-                new Card(Suits.Club, 2),
-                new Card(Suits.Club, 2),
-                new Card(Suits.Club, 2),
-                new Card(Suits.Club, 2),
-                null
-            };
-            Assert.Throws<CardInPokerHandIsNullException>(() => _pokerService.GetWinningHands(new List<Hand> { new Hand(cards) }));
-        }
-
-        public void ShouldThrowRepeatedCardsExceptionOnGetWinningHands()
-        {
-            var cards = new List<Card>
-            {
-                new Card(Suits.Club, 2),
-                new Card(Suits.Club, 3),
-                new Card(Suits.Heart, 3),
-                new Card(Suits.Heart, 2),
-                new Card(Suits.Club, 2),
-            };
-            Assert.Throws<RepeatedCardsException>(() => _pokerService.GetWinningHands(new List<Hand> { new Hand(cards) }));
-        }
-
-        [Test]
-        public void ShouldRestartGame()
-        {
-            _pokerService.RestartGame();
-
-            do
-            {
-                try
-                {
-                    _pokerService.GetHand();
-                }
-
-                catch (NoCardsLeftException)
-                {
-                    break;
-                }
-            } while (true);
-
-            _pokerService.RestartGame();
-            Assert.DoesNotThrow(() => _pokerService.GetHand());
+            Assert.Throws<CardsInPokerHandIsNotFiveException>(() => _cardGameService.GetWinningHands(new List<Hand> { new Hand(null) }));
         }
 
         private static IEnumerable<IGetWinningHandsTester<Hand>> GetSingleWinningHandTestCases()
         {
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Straight Win - High Card",
                 Hands = new List<Hand>
                 {
-                    Hands.SingleWin.StraightWin.HighCardEight
+                    Hands.Poker.SingleWin.StraightWin.HighCardEight
                 },
-                ExpectedResult = Hands.SingleWin.StraightWin.HighCardEight
+                ExpectedResult = Hands.Poker.SingleWin.StraightWin.HighCardEight
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Straight Win - One Pair",
                 Hands = new List<Hand>
                 {
-                    Hands.SingleWin.StraightWin.OnePairQueen,
-                    Hands.SingleWin.StraightWin.HighCardEight,
-                    Hands.SingleWin.StraightWin.HighCardAce
+                    Hands.Poker.SingleWin.StraightWin.OnePairQueen,
+                    Hands.Poker.SingleWin.StraightWin.HighCardEight,
+                    Hands.Poker.SingleWin.StraightWin.HighCardAce
                 },
-                ExpectedResult = Hands.SingleWin.StraightWin.OnePairQueen
+                ExpectedResult = Hands.Poker.SingleWin.StraightWin.OnePairQueen
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Straight Win - Four Of A Kind",
                 Hands = new List<Hand>
                 {
-                    Hands.SingleWin.StraightWin.HighCardEight,
-                    Hands.SingleWin.StraightWin.HighCardAce,
-                    Hands.SingleWin.StraightWin.OnePairTwo,
-                    Hands.SingleWin.StraightWin.OnePairQueen,
-                    Hands.SingleWin.StraightWin.FourOfAKindSeven
+                    Hands.Poker.SingleWin.StraightWin.HighCardEight,
+                    Hands.Poker.SingleWin.StraightWin.HighCardAce,
+                    Hands.Poker.SingleWin.StraightWin.OnePairTwo,
+                    Hands.Poker.SingleWin.StraightWin.OnePairQueen,
+                    Hands.Poker.SingleWin.StraightWin.FourOfAKindSeven
                 },
-                ExpectedResult = Hands.SingleWin.StraightWin.FourOfAKindSeven
+                ExpectedResult = Hands.Poker.SingleWin.StraightWin.FourOfAKindSeven
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - High Card",
                 Hands = new List<Hand>
                 {
-                    Hands.SingleWin.HighCardTieBreaker.HighCardAce1,
-                    Hands.SingleWin.HighCardTieBreaker.HighCardAce2,
-                    Hands.SingleWin.HighCardTieBreaker.HighCardAce3,
-                    Hands.SingleWin.HighCardTieBreaker.HighCardAce4
+                    Hands.Poker.SingleWin.HighCardTieBreaker.HighCardAce1,
+                    Hands.Poker.SingleWin.HighCardTieBreaker.HighCardAce2,
+                    Hands.Poker.SingleWin.HighCardTieBreaker.HighCardAce3,
+                    Hands.Poker.SingleWin.HighCardTieBreaker.HighCardAce4
                 },
-                ExpectedResult = Hands.SingleWin.HighCardTieBreaker.HighCardAce1
+                ExpectedResult = Hands.Poker.SingleWin.HighCardTieBreaker.HighCardAce1
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - One Pair",
                 Hands = new List<Hand>
                 {
-                    Hands.SingleWin.OnePairTieBreaker.OnePairKing1,
-                    Hands.SingleWin.OnePairTieBreaker.OnePairKing2,
-                    Hands.SingleWin.OnePairTieBreaker.HighCardAce1,
-                    Hands.SingleWin.OnePairTieBreaker.HighCardAce2
+                    Hands.Poker.SingleWin.OnePairTieBreaker.OnePairKing1,
+                    Hands.Poker.SingleWin.OnePairTieBreaker.OnePairKing2,
+                    Hands.Poker.SingleWin.OnePairTieBreaker.HighCardAce1,
+                    Hands.Poker.SingleWin.OnePairTieBreaker.HighCardAce2
                 },
-                ExpectedResult = Hands.SingleWin.OnePairTieBreaker.OnePairKing1
+                ExpectedResult = Hands.Poker.SingleWin.OnePairTieBreaker.OnePairKing1
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - Two Pair - On High Card",
                 Hands = new List<Hand>
                 {
-                    Hands.SingleWin.TwoPairTieBreaker.TwoPairAceAnd101,
-                    Hands.SingleWin.TwoPairTieBreaker.TwoPairAceAnd102
+                    Hands.Poker.SingleWin.TwoPairTieBreaker.TwoPairAceAnd101,
+                    Hands.Poker.SingleWin.TwoPairTieBreaker.TwoPairAceAnd102
                 },
-                ExpectedResult = Hands.SingleWin.TwoPairTieBreaker.TwoPairAceAnd101
+                ExpectedResult = Hands.Poker.SingleWin.TwoPairTieBreaker.TwoPairAceAnd101
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - Two Pair - On Highest Pair Value",
                 Hands = new List<Hand>
                 {
-                    Hands.SingleWin.TwoPairTieBreaker.TwoPairQueenAndJack,
-                    Hands.SingleWin.TwoPairTieBreaker.TwoPairQueenAnd9
+                    Hands.Poker.SingleWin.TwoPairTieBreaker.TwoPairQueenAndJack,
+                    Hands.Poker.SingleWin.TwoPairTieBreaker.TwoPairQueenAnd9
                 },
-                ExpectedResult = Hands.SingleWin.TwoPairTieBreaker.TwoPairQueenAndJack
+                ExpectedResult = Hands.Poker.SingleWin.TwoPairTieBreaker.TwoPairQueenAndJack
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - Flush",
                 Hands = new List<Hand>
                 {
-                    Hands.SingleWin.FlushTieBreaker.FlushClubAce,
-                    Hands.SingleWin.FlushTieBreaker.FlushDiamondAce,
-                    Hands.SingleWin.FlushTieBreaker.FlushHeartAce,
-                    Hands.SingleWin.FlushTieBreaker.FlushSpadeAce
+                    Hands.Poker.SingleWin.FlushTieBreaker.FlushClubAce,
+                    Hands.Poker.SingleWin.FlushTieBreaker.FlushDiamondAce,
+                    Hands.Poker.SingleWin.FlushTieBreaker.FlushHeartAce,
+                    Hands.Poker.SingleWin.FlushTieBreaker.FlushSpadeAce
                 },
-                ExpectedResult = Hands.SingleWin.FlushTieBreaker.FlushClubAce
+                ExpectedResult = Hands.Poker.SingleWin.FlushTieBreaker.FlushClubAce
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - Three Of A Kind",
                 Hands = new List<Hand>
                 {
-                    Hands.SingleWin.ThreeOfAKindTieBreaker.ThreeOfAKindKing,
-                    Hands.SingleWin.ThreeOfAKindTieBreaker.ThreeOfAKindQueen
+                    Hands.Poker.SingleWin.ThreeOfAKindTieBreaker.ThreeOfAKindKing,
+                    Hands.Poker.SingleWin.ThreeOfAKindTieBreaker.ThreeOfAKindQueen
                 },
-                ExpectedResult = Hands.SingleWin.ThreeOfAKindTieBreaker.ThreeOfAKindKing
+                ExpectedResult = Hands.Poker.SingleWin.ThreeOfAKindTieBreaker.ThreeOfAKindKing
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - Full House",
                 Hands = new List<Hand>
                 {
-                    Hands.SingleWin.FullHouseTieBreaker.FullHouseKingAndJack,
-                    Hands.SingleWin.FullHouseTieBreaker.FullHouseQueenAnd6
+                    Hands.Poker.SingleWin.FullHouseTieBreaker.FullHouseKingAndJack,
+                    Hands.Poker.SingleWin.FullHouseTieBreaker.FullHouseQueenAnd6
                 },
-                ExpectedResult = Hands.SingleWin.FullHouseTieBreaker.FullHouseKingAndJack
+                ExpectedResult = Hands.Poker.SingleWin.FullHouseTieBreaker.FullHouseKingAndJack
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - Straight",
                 Hands = new List<Hand>
                 {
-                    Hands.SingleWin.StraightTieBreaker.StraightJack,
-                    Hands.SingleWin.StraightTieBreaker.Straight10
+                    Hands.Poker.SingleWin.StraightTieBreaker.StraightJack,
+                    Hands.Poker.SingleWin.StraightTieBreaker.Straight10
                 },
-                ExpectedResult = Hands.SingleWin.StraightTieBreaker.StraightJack
+                ExpectedResult = Hands.Poker.SingleWin.StraightTieBreaker.StraightJack
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - Straight Flush",
                 Hands = new List<Hand>
                 {
-                    Hands.SingleWin.StraightFlushTieBreaker.StraightFlushClubJack,
-                    Hands.SingleWin.StraightFlushTieBreaker.StraightFlushSpade10
+                    Hands.Poker.SingleWin.StraightFlushTieBreaker.StraightFlushClubJack,
+                    Hands.Poker.SingleWin.StraightFlushTieBreaker.StraightFlushSpade10
                 },
-                ExpectedResult = Hands.SingleWin.StraightFlushTieBreaker.StraightFlushClubJack
+                ExpectedResult = Hands.Poker.SingleWin.StraightFlushTieBreaker.StraightFlushClubJack
             };
         }
 
         private static IEnumerable<IGetWinningHandsTester<List<Hand>>> GetMultipleWinningHandTestCases()
         {
-            yield return new GetMultipleWinningHandsTester
+            yield return new GetMultipleWinningHandsTester<PokerService>
             {
                 Description = "Tie Breaker - High Card",
                 Hands = new List<Hand>
                 {
-                    Hands.MultipleWin.HighCardTieBreaker.HighCardAce1,
-                    Hands.MultipleWin.HighCardTieBreaker.HighCardAce2,
-                    Hands.MultipleWin.HighCardTieBreaker.HighCardAce3,
-                    Hands.MultipleWin.HighCardTieBreaker.HighCardAce4
+                    Hands.Poker.MultipleWin.HighCardTieBreaker.HighCardAce1,
+                    Hands.Poker.MultipleWin.HighCardTieBreaker.HighCardAce2,
+                    Hands.Poker.MultipleWin.HighCardTieBreaker.HighCardAce3,
+                    Hands.Poker.MultipleWin.HighCardTieBreaker.HighCardAce4
                 },
                 ExpectedResult = new List<Hand>
                 {
-                    Hands.MultipleWin.HighCardTieBreaker.HighCardAce1,
-                    Hands.MultipleWin.HighCardTieBreaker.HighCardAce2
+                    Hands.Poker.MultipleWin.HighCardTieBreaker.HighCardAce1,
+                    Hands.Poker.MultipleWin.HighCardTieBreaker.HighCardAce2
                 }
             };
-            yield return new GetMultipleWinningHandsTester
+            yield return new GetMultipleWinningHandsTester<PokerService>
             {
                 Description = "Tie Breaker - One Pair",
                 Hands = new List<Hand>
                 {
-                    Hands.MultipleWin.OnePairTieBreaker.OnePairKing1,
-                    Hands.MultipleWin.OnePairTieBreaker.OnePairKing2,
-                    Hands.MultipleWin.OnePairTieBreaker.OnePairJack,
-                    Hands.MultipleWin.OnePairTieBreaker.HighCardAce
+                    Hands.Poker.MultipleWin.OnePairTieBreaker.OnePairKing1,
+                    Hands.Poker.MultipleWin.OnePairTieBreaker.OnePairKing2,
+                    Hands.Poker.MultipleWin.OnePairTieBreaker.OnePairJack,
+                    Hands.Poker.MultipleWin.OnePairTieBreaker.HighCardAce
                 },
                 ExpectedResult = new List<Hand>
                 {
-                    Hands.MultipleWin.OnePairTieBreaker.OnePairKing1,
-                    Hands.MultipleWin.OnePairTieBreaker.OnePairKing2,
+                    Hands.Poker.MultipleWin.OnePairTieBreaker.OnePairKing1,
+                    Hands.Poker.MultipleWin.OnePairTieBreaker.OnePairKing2,
                 }
             };
-            yield return new GetMultipleWinningHandsTester
+            yield return new GetMultipleWinningHandsTester<PokerService>
             {
                 Description = "Tie Breaker - Two Pair",
                 Hands = new List<Hand>
                 {
-                    Hands.MultipleWin.TwoPairTieBreaker.TwoPairAceAnd101,
-                    Hands.MultipleWin.TwoPairTieBreaker.TwoPairAceAnd102
+                    Hands.Poker.MultipleWin.TwoPairTieBreaker.TwoPairAceAnd101,
+                    Hands.Poker.MultipleWin.TwoPairTieBreaker.TwoPairAceAnd102
                 },
                 ExpectedResult = new List<Hand>
                 {
-                    Hands.MultipleWin.TwoPairTieBreaker.TwoPairAceAnd101,
-                    Hands.MultipleWin.TwoPairTieBreaker.TwoPairAceAnd102
+                    Hands.Poker.MultipleWin.TwoPairTieBreaker.TwoPairAceAnd101,
+                    Hands.Poker.MultipleWin.TwoPairTieBreaker.TwoPairAceAnd102
                 }
             };
-            yield return new GetMultipleWinningHandsTester
+            yield return new GetMultipleWinningHandsTester<PokerService>
             {
                 Description = "Tie Breaker - Flush",
                 Hands = new List<Hand>
                 {
-                    Hands.MultipleWin.FlushTieBreaker.FlushClubAce,
-                    Hands.MultipleWin.FlushTieBreaker.FlushDiamondAce,
-                    Hands.MultipleWin.FlushTieBreaker.FlushHeartAce,
-                    Hands.MultipleWin.FlushTieBreaker.FlushSpadeAce
+                    Hands.Poker.MultipleWin.FlushTieBreaker.FlushClubAce,
+                    Hands.Poker.MultipleWin.FlushTieBreaker.FlushDiamondAce,
+                    Hands.Poker.MultipleWin.FlushTieBreaker.FlushHeartAce,
+                    Hands.Poker.MultipleWin.FlushTieBreaker.FlushSpadeAce
                 },
                 ExpectedResult = new List<Hand>
                 {
-                    Hands.MultipleWin.FlushTieBreaker.FlushClubAce,
-                    Hands.MultipleWin.FlushTieBreaker.FlushDiamondAce,
-                    Hands.MultipleWin.FlushTieBreaker.FlushHeartAce
+                    Hands.Poker.MultipleWin.FlushTieBreaker.FlushClubAce,
+                    Hands.Poker.MultipleWin.FlushTieBreaker.FlushDiamondAce,
+                    Hands.Poker.MultipleWin.FlushTieBreaker.FlushHeartAce
                 },
             };
-            yield return new GetMultipleWinningHandsTester
+            yield return new GetMultipleWinningHandsTester<PokerService>
             {
                 Description = "Tie Breaker - Straight",
                 Hands = new List<Hand>
                 {
-                    Hands.MultipleWin.StraightTieBreaker.StraightJack1,
-                    Hands.MultipleWin.StraightTieBreaker.StraightJack2
+                    Hands.Poker.MultipleWin.StraightTieBreaker.StraightJack1,
+                    Hands.Poker.MultipleWin.StraightTieBreaker.StraightJack2
                 },
                 ExpectedResult = new List<Hand>
                 {
-                    Hands.MultipleWin.StraightTieBreaker.StraightJack1,
-                    Hands.MultipleWin.StraightTieBreaker.StraightJack2
+                    Hands.Poker.MultipleWin.StraightTieBreaker.StraightJack1,
+                    Hands.Poker.MultipleWin.StraightTieBreaker.StraightJack2
                 }
             };
-            yield return new GetMultipleWinningHandsTester
+            yield return new GetMultipleWinningHandsTester<PokerService>
             {
                 Description = "Tie Breaker - Straight Flush",
                 Hands = new List<Hand>
                 {
-                    Hands.MultipleWin.StraightFlushTieBreaker.StraightFlushClubJack,
-                    Hands.MultipleWin.StraightFlushTieBreaker.StraightFlushSpadeJack
+                    Hands.Poker.MultipleWin.StraightFlushTieBreaker.StraightFlushClubJack,
+                    Hands.Poker.MultipleWin.StraightFlushTieBreaker.StraightFlushSpadeJack
                 },
                 ExpectedResult = new List<Hand>
                 {
-                    Hands.MultipleWin.StraightFlushTieBreaker.StraightFlushClubJack,
-                    Hands.MultipleWin.StraightFlushTieBreaker.StraightFlushSpadeJack
+                    Hands.Poker.MultipleWin.StraightFlushTieBreaker.StraightFlushClubJack,
+                    Hands.Poker.MultipleWin.StraightFlushTieBreaker.StraightFlushSpadeJack
                 }
             };
         }

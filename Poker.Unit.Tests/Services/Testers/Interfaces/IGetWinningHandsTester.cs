@@ -9,6 +9,6 @@ namespace Poker.Unit.Tests.Services.Testers.Interfaces
         string Description { get; set; }
         List<Hand> Hands { get; set; }
         T ExpectedResult { get; set; }
-        void RunGetWinningHands(IPokerService pokerService);
+        void RunGetWinningHands(ICardGameService pokerService);
     }
 }

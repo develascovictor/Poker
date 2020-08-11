@@ -1,5 +1,7 @@
 ﻿using NUnit.Framework;
 using Poker.Models;
+using Poker.Services;
+using Poker.Services.Base;
 using Poker.Services.Interfaces;
 using Poker.Unit.Tests.Services.Testers.Interfaces;
 using System;
@@ -8,8 +10,10 @@ using System.Linq;
 
 namespace Poker.Unit.Tests.Services.Testers.Base
 {
-    public abstract class BaseGetWinningHandTester<T> : IGetWinningHandsTester<T>
+    public abstract class BaseGetWinningHandTester<TExpectedResult, TCardGameService> : IGetWinningHandsTester<TExpectedResult> where TCardGameService : BaseCardGameService
     {
+        protected readonly Type _cardGameServiceType = typeof(TCardGameService);
+
         /// <summary>
         /// Description
         /// </summary>
@@ -23,19 +27,20 @@ namespace Poker.Unit.Tests.Services.Testers.Base
         /// <summary>
         /// Expected result
         /// </summary>
-        public T ExpectedResult { get; set; }
+        public TExpectedResult ExpectedResult { get; set; }
 
         protected abstract void ValidateGetWinningHands(List<Hand> winningHands);
 
         protected abstract void ValidateExpectedResult();
 
-        public void RunGetWinningHands(IPokerService pokerService)
+        public void RunGetWinningHands(ICardGameService cardGameService)
         {
             try
             {
-                ValidateInitialProperties(pokerService);
+                ValidateInitialProperties(cardGameService);
+                ValidateExpectedResult();
 
-                var winningHands = pokerService.GetWinningHands(Hands).ToList();
+                var winningHands = cardGameService.GetWinningHands(Hands).ToList();
                 ValidateGetWinningHands(winningHands);
             }
 
@@ -46,19 +51,34 @@ namespace Poker.Unit.Tests.Services.Testers.Base
             }
         }
 
-        private void ValidateInitialProperties(IPokerService pokerService)
+        private void ValidateInitialProperties(ICardGameService cardGameService)
         {
             Assert.IsNotEmpty(Hands);
 
             for (var i = 0; i < Hands.Count; i++)
             {
                 Assert.IsNotNull(Hands[i]);
-                Assert.IsNotEmpty(Hands[i].Cards);
-                Assert.AreEqual(5, Hands[i].Cards.Count);
-                Assert.IsTrue(Hands[i].Cards.All(x => x != null));
+
+                var cards = Hands[i].GetCards();
+                Assert.IsNotEmpty(cards);
+                ValidateHandSize(cards);
+                Assert.IsTrue(cards.All(x => x != null));
             }
 
-            Assert.IsNotNull(pokerService);
+            Assert.IsNotNull(cardGameService);
+        }
+
+        protected void ValidateHandSize(IReadOnlyCollection<Card> cards, string errorMessage = null)
+        {
+            if (_cardGameServiceType == typeof(PokerService))
+            {
+                Assert.AreEqual(5, cards.Count, errorMessage);
+            }
+
+            else if (_cardGameServiceType == typeof(BlackJackService))
+            {
+                Assert.GreaterOrEqual(cards.Count, 2, errorMessage);
+            }
         }
     }
 }

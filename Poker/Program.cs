@@ -13,7 +13,7 @@ namespace Poker
         static void Main()
         {
             //Instantiate Poker service
-            var pokerService = (IPokerService)new PokerService();
+            var pokerService = (ICardGameService)new PokerService();
 
             //Playing hands
             var hands = new List<Hand>
