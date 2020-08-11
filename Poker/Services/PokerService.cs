@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace Poker.Services
 {
-    public class PokerService : BaseCardGameService
+    public class PokerService : BaseCardGameService, IPokerService
     {
         public PokerService()
             : base(5)
