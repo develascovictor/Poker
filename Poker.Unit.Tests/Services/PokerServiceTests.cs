@@ -3,6 +3,7 @@ using Poker.Enums;
 using Poker.Exceptions;
 using Poker.Models;
 using Poker.Services;
+using Poker.Services.Interfaces;
 using Poker.Unit.Tests.Services.Base;
 using Poker.Unit.Tests.Services.Testers;
 using Poker.Unit.Tests.Services.Testers.Collections;
@@ -13,7 +14,7 @@ namespace Poker.Unit.Tests.Services
 {
     [TestFixture]
     [Parallelizable(ParallelScope.Fixtures)]
-    public class PokerServiceTests : BaseCardGameServiceTests
+    public class PokerServiceTests : BaseCardGameServiceTests<IPokerService>
     {
         [SetUp]
         public void SetUp()
@@ -61,7 +62,7 @@ namespace Poker.Unit.Tests.Services
 
         private static IEnumerable<IGetWinningHandsTester<Hand>> GetSingleWinningHandTestCases()
         {
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Straight Win - High Card",
                 Hands = new List<Hand>
@@ -70,7 +71,7 @@ namespace Poker.Unit.Tests.Services
                 },
                 ExpectedResult = Hands.Poker.SingleWin.StraightWin.HighCardEight
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Straight Win - One Pair",
                 Hands = new List<Hand>
@@ -81,7 +82,7 @@ namespace Poker.Unit.Tests.Services
                 },
                 ExpectedResult = Hands.Poker.SingleWin.StraightWin.OnePairQueen
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Straight Win - Four Of A Kind",
                 Hands = new List<Hand>
@@ -94,7 +95,7 @@ namespace Poker.Unit.Tests.Services
                 },
                 ExpectedResult = Hands.Poker.SingleWin.StraightWin.FourOfAKindSeven
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - High Card",
                 Hands = new List<Hand>
@@ -106,7 +107,7 @@ namespace Poker.Unit.Tests.Services
                 },
                 ExpectedResult = Hands.Poker.SingleWin.HighCardTieBreaker.HighCardAce1
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - One Pair",
                 Hands = new List<Hand>
@@ -118,7 +119,7 @@ namespace Poker.Unit.Tests.Services
                 },
                 ExpectedResult = Hands.Poker.SingleWin.OnePairTieBreaker.OnePairKing1
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - Two Pair - On High Card",
                 Hands = new List<Hand>
@@ -128,7 +129,7 @@ namespace Poker.Unit.Tests.Services
                 },
                 ExpectedResult = Hands.Poker.SingleWin.TwoPairTieBreaker.TwoPairAceAnd101
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - Two Pair - On Highest Pair Value",
                 Hands = new List<Hand>
@@ -138,7 +139,7 @@ namespace Poker.Unit.Tests.Services
                 },
                 ExpectedResult = Hands.Poker.SingleWin.TwoPairTieBreaker.TwoPairQueenAndJack
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - Flush",
                 Hands = new List<Hand>
@@ -150,7 +151,7 @@ namespace Poker.Unit.Tests.Services
                 },
                 ExpectedResult = Hands.Poker.SingleWin.FlushTieBreaker.FlushClubAce
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - Three Of A Kind",
                 Hands = new List<Hand>
@@ -160,7 +161,7 @@ namespace Poker.Unit.Tests.Services
                 },
                 ExpectedResult = Hands.Poker.SingleWin.ThreeOfAKindTieBreaker.ThreeOfAKindKing
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - Full House",
                 Hands = new List<Hand>
@@ -170,7 +171,7 @@ namespace Poker.Unit.Tests.Services
                 },
                 ExpectedResult = Hands.Poker.SingleWin.FullHouseTieBreaker.FullHouseKingAndJack
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - Straight",
                 Hands = new List<Hand>
@@ -180,7 +181,7 @@ namespace Poker.Unit.Tests.Services
                 },
                 ExpectedResult = Hands.Poker.SingleWin.StraightTieBreaker.StraightJack
             };
-            yield return new GetSingleWinningHandTester
+            yield return new GetSingleWinningHandTester<PokerService>
             {
                 Description = "Tie Breaker - Straight Flush",
                 Hands = new List<Hand>
@@ -194,7 +195,7 @@ namespace Poker.Unit.Tests.Services
 
         private static IEnumerable<IGetWinningHandsTester<List<Hand>>> GetMultipleWinningHandTestCases()
         {
-            yield return new GetMultipleWinningHandsTester
+            yield return new GetMultipleWinningHandsTester<PokerService>
             {
                 Description = "Tie Breaker - High Card",
                 Hands = new List<Hand>
@@ -210,7 +211,7 @@ namespace Poker.Unit.Tests.Services
                     Hands.Poker.MultipleWin.HighCardTieBreaker.HighCardAce2
                 }
             };
-            yield return new GetMultipleWinningHandsTester
+            yield return new GetMultipleWinningHandsTester<PokerService>
             {
                 Description = "Tie Breaker - One Pair",
                 Hands = new List<Hand>
@@ -226,7 +227,7 @@ namespace Poker.Unit.Tests.Services
                     Hands.Poker.MultipleWin.OnePairTieBreaker.OnePairKing2,
                 }
             };
-            yield return new GetMultipleWinningHandsTester
+            yield return new GetMultipleWinningHandsTester<PokerService>
             {
                 Description = "Tie Breaker - Two Pair",
                 Hands = new List<Hand>
@@ -240,7 +241,7 @@ namespace Poker.Unit.Tests.Services
                     Hands.Poker.MultipleWin.TwoPairTieBreaker.TwoPairAceAnd102
                 }
             };
-            yield return new GetMultipleWinningHandsTester
+            yield return new GetMultipleWinningHandsTester<PokerService>
             {
                 Description = "Tie Breaker - Flush",
                 Hands = new List<Hand>
@@ -257,7 +258,7 @@ namespace Poker.Unit.Tests.Services
                     Hands.Poker.MultipleWin.FlushTieBreaker.FlushHeartAce
                 },
             };
-            yield return new GetMultipleWinningHandsTester
+            yield return new GetMultipleWinningHandsTester<PokerService>
             {
                 Description = "Tie Breaker - Straight",
                 Hands = new List<Hand>
@@ -271,7 +272,7 @@ namespace Poker.Unit.Tests.Services
                     Hands.Poker.MultipleWin.StraightTieBreaker.StraightJack2
                 }
             };
-            yield return new GetMultipleWinningHandsTester
+            yield return new GetMultipleWinningHandsTester<PokerService>
             {
                 Description = "Tie Breaker - Straight Flush",
                 Hands = new List<Hand>

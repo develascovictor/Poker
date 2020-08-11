@@ -9,9 +9,9 @@ using System.Linq;
 
 namespace Poker.Unit.Tests.Services.Base
 {
-    public abstract class BaseCardGameServiceTests
+    public abstract class BaseCardGameServiceTests<TCardGameService> where TCardGameService : ICardGameService
     {
-        protected ICardGameService _cardGameService;
+        protected TCardGameService _cardGameService;
         protected int _initialHandCardCount;
 
         [Test]

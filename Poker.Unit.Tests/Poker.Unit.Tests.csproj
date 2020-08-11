@@ -80,6 +80,7 @@
     <Compile Include="Models\Testers\HandTester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Base\BaseCardGameServiceTests.cs" />
+    <Compile Include="Services\BlackJackServiceTests.cs" />
     <Compile Include="Services\PokerServiceTests.cs" />
     <Compile Include="Services\Testers\Base\BaseGetWinningHandTester.cs" />
     <Compile Include="Services\Testers\Collections\Cards.cs" />

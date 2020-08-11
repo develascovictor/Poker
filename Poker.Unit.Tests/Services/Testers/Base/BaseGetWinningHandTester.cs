@@ -1,5 +1,7 @@
 ﻿using NUnit.Framework;
 using Poker.Models;
+using Poker.Services;
+using Poker.Services.Base;
 using Poker.Services.Interfaces;
 using Poker.Unit.Tests.Services.Testers.Interfaces;
 using System;
@@ -8,8 +10,10 @@ using System.Linq;
 
 namespace Poker.Unit.Tests.Services.Testers.Base
 {
-    public abstract class BaseGetWinningHandTester<T> : IGetWinningHandsTester<T>
+    public abstract class BaseGetWinningHandTester<TExpectedResult, TCardGameService> : IGetWinningHandsTester<TExpectedResult> where TCardGameService : BaseCardGameService
     {
+        protected readonly Type _cardGameServiceType = typeof(TCardGameService);
+
         /// <summary>
         /// Description
         /// </summary>
@@ -23,7 +27,7 @@ namespace Poker.Unit.Tests.Services.Testers.Base
         /// <summary>
         /// Expected result
         /// </summary>
-        public T ExpectedResult { get; set; }
+        public TExpectedResult ExpectedResult { get; set; }
 
         protected abstract void ValidateGetWinningHands(List<Hand> winningHands);
 
@@ -57,11 +61,24 @@ namespace Poker.Unit.Tests.Services.Testers.Base
 
                 var cards = Hands[i].GetCards();
                 Assert.IsNotEmpty(cards);
-                Assert.AreEqual(5, cards.Count);
+                ValidateHandSize(cards);
                 Assert.IsTrue(cards.All(x => x != null));
             }
 
             Assert.IsNotNull(cardGameService);
+        }
+
+        protected void ValidateHandSize(IReadOnlyCollection<Card> cards, string errorMessage = null)
+        {
+            if (_cardGameServiceType == typeof(PokerService))
+            {
+                Assert.AreEqual(5, cards.Count, errorMessage);
+            }
+
+            else if (_cardGameServiceType == typeof(BlackJackService))
+            {
+                Assert.GreaterOrEqual(cards.Count, 2, errorMessage);
+            }
         }
     }
 }

@@ -1,16 +1,23 @@
 ﻿using NUnit.Framework;
 using Poker.Models;
+using Poker.Services;
+using Poker.Services.Base;
 using Poker.Unit.Tests.Services.Testers.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Poker.Unit.Tests.Services.Testers
 {
-    public class GetMultipleWinningHandsTester : BaseGetWinningHandTester<List<Hand>>
+    public class GetMultipleWinningHandsTester<TCardGameService> : BaseGetWinningHandTester<List<Hand>, TCardGameService> where TCardGameService : BaseCardGameService
     {
         protected override void ValidateGetWinningHands(List<Hand> winningHands)
         {
-            Assert.IsNotEmpty(winningHands);
+            if (_cardGameServiceType == typeof(PokerService))
+            {
+                Assert.IsNotEmpty(winningHands);
+            }
+
             Assert.AreEqual(ExpectedResult.Count, winningHands.Count);
 
             for (var i = 0; i < ExpectedResult.Count; i++)
@@ -20,9 +27,9 @@ namespace Poker.Unit.Tests.Services.Testers
 
                 var cards = winningHand.GetCards().ToList();
                 Assert.IsNotEmpty(cards, $"Hand's cards is null. [i: {i}]");
-                Assert.AreEqual(5, cards.Count, $"Hand's cards count doesn't match. [i: {i}]");
+                ValidateHandSize(cards, $"Hand's cards count doesn't match. [i: {i}]");
 
-                for (var j = 0; j < 5; j++)
+                for (var j = 0; j < cards.Count; j++)
                 {
                     Assert.IsNotNull(cards[j], $"Card is null. [i: {i}] [j: {j}]");
 
@@ -35,7 +42,12 @@ namespace Poker.Unit.Tests.Services.Testers
 
         protected override void ValidateExpectedResult()
         {
-            Assert.IsNotEmpty(ExpectedResult);
+            Assert.IsNotNull(ExpectedResult);
+
+            if (_cardGameServiceType == typeof(PokerService))
+            {
+                Assert.IsNotEmpty(ExpectedResult);
+            }
 
             for (var i = 0; i < ExpectedResult.Count; i++)
             {
@@ -44,7 +56,7 @@ namespace Poker.Unit.Tests.Services.Testers
 
                 var expectedCards = expectedResult.GetCards();
                 Assert.IsNotEmpty(expectedCards, $"Expected Result's cards is null. [i: {i}]");
-                Assert.AreEqual(5, expectedCards.Count, $"Expected Result's cards count doesn't match. [i: {i}]");
+                ValidateHandSize(expectedCards, $"Expected Result's cards count doesn't match. [i: {i}]");
                 Assert.IsTrue(expectedCards.All(x => x != null), $"Expected Result's cards has a null record. [i: {i}]");
             }
         }
